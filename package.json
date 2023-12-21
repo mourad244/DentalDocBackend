@@ -1,0 +1,45 @@
+{
+  "name": "dental-doc-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mourad244/dentaireBackend.git"
+  },
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "body-parser": "^1.19.0",
+    "compression": "^1.7.4",
+    "config": "^3.3.3",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "express-async-errors": "^3.1.1",
+    "helmet": "^4.3.1",
+    "joi": "^17.3.0",
+    "joi-objectid": "^3.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "killport": "^1.0.2",
+    "lodash": "^4.17.21",
+    "mongoose": "^5.12.4",
+    "multer": "^1.4.2",
+    "winston": "^3.3.3",
+    "winston-mongodb": "^5.0.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12",
+    "prettier": "^2.3.2"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mourad244/svc-dentaire/issues"
+  },
+  "homepage": "https://github.com/mourad244/svc-dentaire#readme",
+  "description": ""
+}
