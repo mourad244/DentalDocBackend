@@ -14,12 +14,12 @@ router.get("/", async (req, res) => {
   const rdvs = await Rdv.find()
     .populate({
       path: "patientId",
-      select: " nom prenom",
+      select: "nom prenom telephone",
     })
-    .populate({
-      path: "medecinId",
-      select: "nom",
-    })
+    // .populate({
+    //   path: "medecinId",
+    //   select: "nom",
+    // })
 
     .sort("datePrevu");
   res.send(rdvs);
@@ -29,24 +29,25 @@ router.post("/", [auth, admin], async (req, res) => {
   const { error } = validations.rdv(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const { patientId, medecinId, datePrevu, description, isHonnore } = req.body;
+  const { patientId, /* medecinId, */ datePrevu, description, isHonnore } =
+    req.body;
 
   // validation to delete if sure they are called just before
 
   const patient = await Patient.findById(patientId);
   if (!patient) return res.status(400).send("Patient Invalide.");
-  const medecin = await Medecin.findById(medecinId);
-  if (!medecin) return res.status(400).send("Medecin Invalide.");
+  // const medecin = await Medecin.findById(medecinId);
+  // if (!medecin) return res.status(400).send("Medecin Invalide.");
   const rdv = new Rdv({
     patientId: patientId,
-    medecinId: medecinId,
+    // medecinId: medecinId,
     datePrevu: datePrevu,
     description: description,
     isHonnore: isHonnore === null ? undefined : isHonnore,
   });
   patient.prochainRdv = {
     date: datePrevu,
-    medecinId: medecinId,
+    // medecinId: medecinId,
   };
   await rdv.save();
   await patient.save();
@@ -56,17 +57,18 @@ router.post("/", [auth, admin], async (req, res) => {
 router.put("/:id", [auth, admin], async (req, res) => {
   const { error } = validations.rdv(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  const { patientId, medecinId, datePrevu, description, isHonnore } = req.body;
+  const { patientId, /* medecinId, */ datePrevu, description, isHonnore } =
+    req.body;
   // validation to delete if sure they are called just before
   const patient = await Patient.findById(patientId);
   if (!patient) return res.status(400).send("Patient Invalide.");
-  const medecin = await Medecin.findById(medecinId);
-  if (!medecin) return res.status(400).send("Medecin Invalide.");
+  // const medecin = await Medecin.findById(medecinId);
+  // if (!medecin) return res.status(400).send("Medecin Invalide.");
   const rdv = await Rdv.findByIdAndUpdate(
     req.params.id,
     {
       patientId: patientId,
-      medecinId: medecinId,
+      // medecinId: medecinId,
       datePrevu: datePrevu,
       description: description ? description : "",
       isHonnore: isHonnore,
@@ -82,7 +84,10 @@ router.put("/:id", [auth, admin], async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-  const rdv = await Rdv.findById(req.params.id);
+  const rdv = await Rdv.findById(req.params.id).populate({
+    path: "patientId",
+    select: "nom prenom telephone",
+  });
   if (!rdv) return res.status(404).send("le rdv avec cet id n'existe pas");
   res.send(rdv);
 });
@@ -103,7 +108,7 @@ router.delete("/:id", [auth, admin], async (req, res) => {
   ) {
     patient.prochainRdv = {
       date: "",
-      medecinId: patient.prochainRdv.medecinId,
+      // medecinId: patient.prochainRdv.medecinId,
     };
     await patient.save();
   }
