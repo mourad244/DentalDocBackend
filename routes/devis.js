@@ -15,8 +15,7 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   const devis = await Devi.find()
-    .populate("medecinId")
-    .populate("cabinetId")
+    // .populate("medecinId")
     .populate({
       path: "medecinId",
     })
@@ -31,15 +30,8 @@ router.get("/", async (req, res) => {
 router.post("/", [auth, admin], async (req, res) => {
   const { error } = validations.devi(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  const {
-    numOrdre,
-    patientId,
-    medecinId,
-    cabinetId,
-    dateDevi,
-    prix,
-    acteEffectues,
-  } = req.body;
+  const { numOrdre, patientId, medecinId, dateDevi, montant, acteEffectues } =
+    req.body;
 
   // validation to delete if sure they are called just before
 
@@ -49,8 +41,6 @@ router.post("/", [auth, admin], async (req, res) => {
   const medecin = await Medecin.findById(medecinId);
   if (!medecin) return res.status(400).send("Medecin Invalide.");
 
-  const cabinet = await Cabinet.findById(cabinetId);
-  if (!cabinet) return res.status(400).send("Cabinet Invalide.");
   //search in array
 
   // validations
@@ -103,18 +93,17 @@ router.post("/", [auth, admin], async (req, res) => {
     numOrdre: numOrdre,
     patientId: patientId,
     medecinId: medecinId,
-    cabinetId: cabinetId,
     dateDevi: dateDevi,
     acteEffectues: acteEffectues,
-    prix: prix,
+    montant: montant,
   });
   // add devi to patient model
   patient.deviIds.push({
     deviId: devi._id,
-    montant: prix,
+    montant: montant,
   });
-  patient.totalDevis();
-  patient.calculateBalance();
+  // patient.totalDevis();
+  // patient.calculateBalance();
   await devi.save();
   await patient.save();
   res.send(devi);
@@ -124,8 +113,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
   const { error } = validations.devi(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const { numOrdre, patientId, medecinId, cabinetId, dateDevi, acteEffectues } =
-    req.body;
+  const { numOrdre, patientId, medecinId, dateDevi, acteEffectues } = req.body;
 
   // validation to delete if sure they are called just before
   const patient = await Patient.findById(patientId);
@@ -133,11 +121,6 @@ router.put("/:id", [auth, admin], async (req, res) => {
 
   const medecin = await Medecin.findById(medecinId);
   if (!medecin) return res.status(400).send("Medecin Invalide.");
-
-  if (cabinetId) {
-    const cabinet = await Cabinet.findById(cabinetId);
-    if (!cabinet) return res.status(400).send("Cabinet Invalide.");
-  }
 
   // validations
   let i = 0;
@@ -174,10 +157,9 @@ router.put("/:id", [auth, admin], async (req, res) => {
       numOrdre,
       patientId,
       medecinId,
-      cabinetId,
       dateDevi,
       acteEffectues,
-      prix,
+      montant,
     },
     {
       new: true,
@@ -188,7 +170,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
 
   // add devi to patient model after checking existance
   if (!patient.deviIds.find((i) => (i.deviId = devi._id))) {
-    patient.deviIds.push({ deviId: devi._id, montant: prix });
+    patient.deviIds.push({ deviId: devi._id, montant: montant });
     // patient.totalDevis();
     // patient.calculateBalance();
   }

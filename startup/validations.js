@@ -8,7 +8,6 @@ module.exports = {
       password: Joi.string().min(5).max(255),
       roleId: Joi.objectId(),
     });
-
     return schema.validate(userObj);
   },
 
@@ -98,8 +97,7 @@ module.exports = {
     const schema = Joi.object({
       numOrdre: Joi.number().allow(null),
       patientId: Joi.objectId().required(),
-      // medecinId: Joi.objectId().required(),
-      cabinetId: Joi.objectId().allow(null),
+      medecinId: Joi.objectId().required(),
       dateDevi: Joi.date(),
       montant: Joi.number().allow(""),
       acteEffectues: Joi.array(),

@@ -13,15 +13,15 @@ const deviSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Medecin",
   },
-  cabinetId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Cabinet",
-  },
+  // cabinetId: {
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "Cabinet",
+  // },
   dateDevi: {
     type: Date,
     default: Date.now,
   },
-  prix: {
+  montant: {
     type: Number,
   },
   acteEffectues: [
