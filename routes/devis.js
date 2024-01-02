@@ -214,17 +214,17 @@ router.delete("/:id", [auth, admin], async (req, res) => {
   const devis = patient.deviIds;
 
   // search in patient.deviIds and check existance of id of devi
-  devis.some((e, index) => {
-    if (e.deviId == req.params.id) {
-      devis.splice(index, 1);
-      return true;
-    }
-  });
+  // devis.some((e, index) => {
+  //   if (e.deviId == req.params.id) {
+  //     devis.splice(index, 1);
+  //     return true;
+  //   }
+  // });
 
-  patient.totalDevis();
-  patient.calculateBalance();
+  // patient.totalDevis();
+  // patient.calculateBalance();
 
-  await patient.save();
+  // await patient.save();
 
   res.send(devi);
 });
