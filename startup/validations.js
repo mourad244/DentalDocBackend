@@ -95,7 +95,7 @@ module.exports = {
   },
   devi: (devi) => {
     const schema = Joi.object({
-      numOrdre: Joi.number().allow(null),
+      numOrdre: Joi.number().allow(null).allow(""),
       patientId: Joi.objectId().required(),
       medecinId: Joi.objectId().required(),
       dateDevi: Joi.date(),

@@ -3,10 +3,9 @@ const { Devi } = require("../models/devi");
 
 const { Patient } = require("../models/patient");
 const { Medecin } = require("../models/medecin");
-const { Cabinet } = require("../models/cabinet");
 const { ActeDentaire } = require("../models/acteDentaire");
 const { Dent } = require("../models/dent");
-
+const { NumOrdreCounter } = require("../models/numOrdreCounter");
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 
@@ -29,11 +28,20 @@ router.get("/", async (req, res) => {
 
 router.post("/", [auth, admin], async (req, res) => {
   const { error } = validations.devi(req.body);
+  // console.log(error);
   if (error) return res.status(400).send(error.details[0].message);
-  const { numOrdre, patientId, medecinId, dateDevi, montant, acteEffectues } =
-    req.body;
+  const { patientId, medecinId, dateDevi, montant, acteEffectues } = req.body;
 
-  // validation to delete if sure they are called just before
+  const currentYear = new Date(dateDevi).getFullYear();
+  let counter = await NumOrdreCounter.findOne({ year: currentYear });
+  if (!counter) {
+    counter = new NumOrdreCounter({
+      lastNumOrdre: 0,
+      year: currentYear,
+    });
+  }
+  counter.lastNumOrdre += 1;
+  const numOrdre = counter.lastNumOrdre;
 
   const patient = await Patient.findById(patientId).populate("adherenceId");
   if (!patient) return res.status(400).send("Patient Invalide.");
@@ -113,7 +121,8 @@ router.put("/:id", [auth, admin], async (req, res) => {
   const { error } = validations.devi(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const { numOrdre, patientId, medecinId, dateDevi, acteEffectues } = req.body;
+  const { numOrdre, patientId, medecinId, dateDevi, montant, acteEffectues } =
+    req.body;
 
   // validation to delete if sure they are called just before
   const patient = await Patient.findById(patientId);
@@ -184,6 +193,9 @@ router.get("/:id", async (req, res) => {
     .populate({
       path: "medecinId",
     })
+    .populate({
+      path: "patientId",
+    })
     .populate([
       {
         path: "acteEffectues",
@@ -214,17 +226,17 @@ router.delete("/:id", [auth, admin], async (req, res) => {
   const devis = patient.deviIds;
 
   // search in patient.deviIds and check existance of id of devi
-  // devis.some((e, index) => {
-  //   if (e.deviId == req.params.id) {
-  //     devis.splice(index, 1);
-  //     return true;
-  //   }
-  // });
+  devis.some((e, index) => {
+    if (e.deviId == req.params.id) {
+      devis.splice(index, 1);
+      return true;
+    }
+  });
 
   // patient.totalDevis();
   // patient.calculateBalance();
 
-  // await patient.save();
+  await patient.save();
 
   res.send(devi);
 });
