@@ -99,7 +99,7 @@ module.exports = {
       patientId: Joi.objectId().required(),
       medecinId: Joi.objectId().required(),
       dateDevi: Joi.date(),
-      montant: Joi.number().allow(""),
+      montant: Joi.number().allow("").allow(null),
       acteEffectues: Joi.array(),
     });
     return schema.validate(devi);

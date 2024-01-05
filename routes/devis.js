@@ -28,7 +28,6 @@ router.get("/", async (req, res) => {
 
 router.post("/", [auth, admin], async (req, res) => {
   const { error } = validations.devi(req.body);
-  // console.log(error);
   if (error) return res.status(400).send(error.details[0].message);
   const { patientId, medecinId, dateDevi, montant, acteEffectues } = req.body;
 
@@ -45,9 +44,10 @@ router.post("/", [auth, admin], async (req, res) => {
 
   const patient = await Patient.findById(patientId).populate("adherenceId");
   if (!patient) return res.status(400).send("Patient Invalide.");
-
-  const medecin = await Medecin.findById(medecinId);
-  if (!medecin) return res.status(400).send("Medecin Invalide.");
+  if (medecinId) {
+    const medecin = await Medecin.findById(medecinId);
+    if (!medecin) return res.status(400).send("Medecin Invalide.");
+  }
 
   //search in array
 
@@ -127,10 +127,10 @@ router.put("/:id", [auth, admin], async (req, res) => {
   // validation to delete if sure they are called just before
   const patient = await Patient.findById(patientId);
   if (!patient) return res.status(400).send("Patient Invalide.");
-
-  const medecin = await Medecin.findById(medecinId);
-  if (!medecin) return res.status(400).send("Medecin Invalide.");
-
+  if (medecinId) {
+    const medecin = await Medecin.findById(medecinId);
+    if (!medecin) return res.status(400).send("Medecin Invalide.");
+  }
   // validations
   let i = 0;
   let j = 0;
@@ -221,23 +221,11 @@ router.delete("/:id", [auth, admin], async (req, res) => {
   const devi = await Devi.findByIdAndRemove(req.params.id);
   if (!devi) return res.status(404).send("le devi avec cet id n'existe pas");
 
-  // delete devi from patient model
   const patient = await Patient.findById(devi.patientId);
-  const devis = patient.deviIds;
-
-  // search in patient.deviIds and check existance of id of devi
-  devis.some((e, index) => {
-    if (e.deviId == req.params.id) {
-      devis.splice(index, 1);
-      return true;
-    }
-  });
-
-  // patient.totalDevis();
-  // patient.calculateBalance();
-
+  // delete devi from patient model
+  const index = patient.deviIds.indexOf(devi._id);
+  patient.deviIds.splice(index, 1);
   await patient.save();
-
   res.send(devi);
 });
 
