@@ -41,7 +41,6 @@ router.post("/", [auth, admin], async (req, res) => {
   }
   counter.lastNumOrdre += 1;
   const numOrdre = counter.lastNumOrdre;
-  console.log("numOrdre", numOrdre);
   const patient = await Patient.findById(patientId).populate("adherenceId");
   if (!patient) return res.status(400).send("Patient Invalide.");
   if (medecinId) {
@@ -112,6 +111,7 @@ router.post("/", [auth, admin], async (req, res) => {
   });
   // patient.totalDevis();
   // patient.calculateBalance();
+  await counter.save();
   await devi.save();
   await patient.save();
   res.send(devi);
@@ -220,12 +220,15 @@ router.get("/:id", async (req, res) => {
 router.delete("/:id", [auth, admin], async (req, res) => {
   const devi = await Devi.findByIdAndRemove(req.params.id);
   if (!devi) return res.status(404).send("le devi avec cet id n'existe pas");
-
-  const patient = await Patient.findById(devi.patientId);
   // delete devi from patient model
-  const index = patient.deviIds.indexOf(devi._id);
-  patient.deviIds.splice(index, 1);
-  await patient.save();
+  try {
+    await Patient.findByIdAndUpdate(devi.patientId, {
+      $pull: { deviIds: { deviId: devi._id } },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("An error occurred");
+  }
   res.send(devi);
 });
 
