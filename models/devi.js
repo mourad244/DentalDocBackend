@@ -28,7 +28,7 @@ const deviSchema = new mongoose.Schema({
     {
       acteId: { type: mongoose.Schema.Types.ObjectId, ref: "ActeDentaire" },
       dentIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Dent" }],
-
+      prix: { type: Number },
       isPaye: {
         type: Boolean,
         default: false,

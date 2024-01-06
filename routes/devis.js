@@ -41,7 +41,7 @@ router.post("/", [auth, admin], async (req, res) => {
   }
   counter.lastNumOrdre += 1;
   const numOrdre = counter.lastNumOrdre;
-
+  console.log("numOrdre", numOrdre);
   const patient = await Patient.findById(patientId).populate("adherenceId");
   if (!patient) return res.status(400).send("Patient Invalide.");
   if (medecinId) {
