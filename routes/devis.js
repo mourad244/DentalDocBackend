@@ -58,8 +58,12 @@ router.post("/", [auth, admin], async (req, res) => {
     if (acteEffectues[i]) {
       const acteDentaire = await ActeDentaire.findById(acteEffectues[i].acteId);
       if (!acteDentaire) return res.status(400).send("acte Invalide.");
+      // if prix of acteDentaire is null or undefined or 0 or "" then affect the price acteEffectues[i].prix to acteDentaire
+      if (acteDentaire.prix === null || acteDentaire.prix === undefined) {
+        acteDentaire.prix = acteEffectues[i].prix;
+        await acteDentaire.save();
+      }
     }
-
     if (acteEffectues[i].dentIds && acteEffectues[i].dentIds.length !== 0)
       while (j < acteEffectues[i].dentIds.length) {
         const dent = await Dent.findById(acteEffectues[i].dentIds[j]);

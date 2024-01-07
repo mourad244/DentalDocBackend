@@ -2,8 +2,6 @@ const express = require("express");
 const { Paiement } = require("../models/paiement");
 const { Patient } = require("../models/patient");
 
-const { NatureActe } = require("../models/natureActe");
-
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 const role = require("../middleware/role");
@@ -13,17 +11,14 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   const paiements = await Paiement.find()
-    .populate("cabinetId")
     .populate({
       path: "medecinId",
-     
     })
     .populate({
       path: "patientId",
-      select: "  nom prenom dateRecu",
+      select: "  nom prenom date",
     })
-    .populate("natureActeId")
-    .sort("datePaiement");
+    .sort("date");
   // execte query updatePatientIds for each paiement
   // let x = 0;
   // paiements.forEach(async (paiement) => {
@@ -50,11 +45,10 @@ router.post("/", [auth, admin], async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
   const {
     patientId,
-    numRecu,
-    modePaiement,
+    numOrdre,
     numCheque,
-    datePaiement,
-    natureActeId,
+    mode,
+    date,
     montant,
     // isSoins,
   } = req.body;
@@ -63,14 +57,12 @@ router.post("/", [auth, admin], async (req, res) => {
   const patient = await Patient.findById(patientId);
   if (!patient) return res.status(400).send("Patient Invalide.");
 
-
   const paiement = new Paiement({
     patientId: patientId,
-    numRecu: numRecu,
-    modePaiement: modePaiement,
+    numOrdre: numOrdre,
+    mode: mode,
     numCheque: numCheque,
-    datePaiement: datePaiement,
-    natureActeId: natureActeId,
+    date: date,
     montant: montant,
   });
 
@@ -79,8 +71,6 @@ router.post("/", [auth, admin], async (req, res) => {
   patient.paiementIds.push({
     paiementId: paiement._id,
     montant: montant,
-    natureActeId: natureActeId,
-    isSoins: isSoins,
   });
   patient.totalPaiements();
   patient.calculateBalance();
@@ -94,15 +84,8 @@ router.put("/:id", [auth, admin], async (req, res) => {
   const { error } = validations.paiement(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const {
-    patientId,
-    numRecu,
-    modePaiement,
-    numCheque,
-    natureActeId,
-    datePaiement,
-    montant,
-  } = req.body;
+  const { patientId, numOrdre, mode, numCheque, natureActeId, date, montant } =
+    req.body;
 
   // validation to delete if sure they are called just before
   const patient = await Patient.findById(patientId);
@@ -112,11 +95,10 @@ router.put("/:id", [auth, admin], async (req, res) => {
     req.params.id,
     {
       patientId: patientId,
-      numRecu: numRecu,
-      modePaiement: modePaiement,
+      numOrdre: numOrdre,
+      mode: mode,
       numCheque: numCheque,
-      natureActeId: natureActeId,
-      datePaiement: datePaiement,
+      date: date,
       montant: montant,
     },
     {
@@ -132,7 +114,6 @@ router.put("/:id", [auth, admin], async (req, res) => {
     patient.paiementIds.push({
       paiementId: paiement._id,
       montant: montant,
-      natureActeId: natureActeId,
     });
 
     patient.totalPaiements();
@@ -154,22 +135,14 @@ router.delete("/:id", [auth, admin], async (req, res) => {
   if (!paiement)
     return res.status(404).send("le paiement avec cet id n'existe pas");
 
-  // delete paiement from patient model
-
-  const patient = await Patient.findById(paiement.patientId);
-  const paiements = patient.paiementIds;
-  // search in patient.paiementIds and check the existance of Id of paiement
-  paiements.some((e, index) => {
-    if (e.paiementId == req.params.id) {
-      paiements.splice(index, 1);
-      return true;
-    }
-  });
-
-  patient.totalPaiements();
-
-  await patient.save();
-
+  try {
+    await Patient.findByIdAndUpdate(paiement.patientId, {
+      $pull: { deviIds: { deviId: paiement._id } },
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("An error occurred");
+  }
   res.send(paiement);
 });
 
