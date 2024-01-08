@@ -1,15 +1,16 @@
 const express = require("express");
-const { Devi } = require("../models/devi");
 
+const { Devi } = require("../models/devi");
+const { Dent } = require("../models/dent");
 const { Patient } = require("../models/patient");
 const { Medecin } = require("../models/medecin");
+const { CounterDevi } = require("../models/counterDevi");
 const { ActeDentaire } = require("../models/acteDentaire");
-const { Dent } = require("../models/dent");
-const { NumOrdreCounter } = require("../models/numOrdreCounter");
+
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
-
 const validations = require("../startup/validations");
+
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -21,7 +22,6 @@ router.get("/", async (req, res) => {
     .populate({
       path: "patientId",
     })
-
     .sort("numOrdre");
   res.send(devis);
 });
@@ -32,24 +32,22 @@ router.post("/", [auth, admin], async (req, res) => {
   const { patientId, medecinId, dateDevi, montant, acteEffectues } = req.body;
 
   const currentYear = new Date(dateDevi).getFullYear();
-  let counter = await NumOrdreCounter.findOne({ year: currentYear });
+  let counter = await CounterDevi.findOne({ year: currentYear });
   if (!counter) {
-    counter = new NumOrdreCounter({
+    counter = new CounterDevi({
       lastNumOrdre: 0,
       year: currentYear,
     });
   }
   counter.lastNumOrdre += 1;
   const numOrdre = counter.lastNumOrdre;
+
   const patient = await Patient.findById(patientId).populate("adherenceId");
   if (!patient) return res.status(400).send("Patient Invalide.");
   if (medecinId) {
     const medecin = await Medecin.findById(medecinId);
     if (!medecin) return res.status(400).send("Medecin Invalide.");
   }
-
-  //search in array
-
   // validations
 
   let i = 0;
@@ -72,34 +70,6 @@ router.post("/", [auth, admin], async (req, res) => {
       }
     i++;
   }
-  // calcule prix
-  // const adherence = await Adherence.findById(patient.adherenceId);
-  // if (adherence.nom === "A") adherence.nom = "FA";
-
-  // let prixSoins = 0;
-  // let prixProtheses = 0;
-
-  // acteEffectues.map(async (acteItem) => {
-  //   const acteDentaire = await ActeDentaire.findById(acteItem.acteId).populate(
-  //     "natureId"
-  //   );
-  //   if (acteDentaire.natureId.nom === "Prothèses") {
-  //     if (patient.adherenceId.nom === "A") patient.adherenceId.nom = "FA";
-  //     prixProtheses += acteDentaire[patient.adherenceId.nom];
-  //   } else {
-  //     if (patient.adherenceId.nom === "A") patient.adherenceId.nom = "FA";
-  //     prixSoins += acteDentaire[patient.adherenceId.nom];
-  //   }
-  //   return [prixSoins, prixProtheses];
-  // });
-
-  // let prix = 0;
-  // for (let i = 0; i < acteEffectues.length; i++) {
-  //   const acteDentaire = await ActeDentaire.findById(acteEffectues[i].acteId);
-
-  //   // if (acteEffectues[i].dentIds && acteEffectues[i].dentIds.length !== 0)
-  //   prix += acteDentaire[adherence.nom];
-  // }
   const devi = new Devi({
     numOrdre: numOrdre,
     patientId: patientId,
@@ -108,13 +78,14 @@ router.post("/", [auth, admin], async (req, res) => {
     acteEffectues: acteEffectues,
     montant: montant,
   });
-  // add devi to patient model
   patient.deviIds.push({
     deviId: devi._id,
     montant: montant,
   });
-  // patient.totalDevis();
-  // patient.calculateBalance();
+
+  patient.calculateTotalDevis();
+  patient.calculateBalance();
+
   await counter.save();
   await devi.save();
   await patient.save();
@@ -187,6 +158,8 @@ router.put("/:id", [auth, admin], async (req, res) => {
     // patient.totalDevis();
     // patient.calculateBalance();
   }
+  patient.calculateTotalDevis();
+  patient.calculateBalance();
 
   await patient.save();
   res.send(devi);
@@ -228,11 +201,14 @@ router.delete("/:id", [auth, admin], async (req, res) => {
   try {
     await Patient.findByIdAndUpdate(devi.patientId, {
       $pull: { deviIds: { deviId: devi._id } },
+      $inc: { totalDevis: -devi.montant },
+      $inc: { balance: -devi.montant },
     });
   } catch (error) {
     console.log(error);
     return res.status(500).send("An error occurred");
   }
+
   res.send(devi);
 });
 

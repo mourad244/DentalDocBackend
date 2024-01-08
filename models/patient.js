@@ -133,20 +133,20 @@ const patientSchema = new mongoose.Schema({
       ref: "Medecin",
     },
   },
-  report: {
-    actes: Number,
-    recettes: Number,
-    isAJour: {
-      type: Boolean,
-      default: false,
-    },
-  },
+  // report: {
+  //   actes: Number,
+  //   recettes: Number,
+  //   isAJour: {
+  //     type: Boolean,
+  //     default: false,
+  //   },
+  // },
 
-  montantAPayer: {
+  totalDevis: {
     type: Number,
     default: 0,
   },
-  montantPaye: {
+  totalPaiements: {
     type: Number,
     default: 0,
   },
@@ -155,37 +155,24 @@ const patientSchema = new mongoose.Schema({
     default: 0,
   },
 });
-/* patientSchema.methods.totalDevis = function () {
-  let sumDevisProtheses = this.report.acteProtheses
-    ? this.report.acteProtheses
-    : 0;
-  let sumDevisSoins = this.report.acteSoins ? this.report.acteSoins : 0;
-  this.deviIds.map((deviItem) => {
-    sumDevisProtheses += deviItem.montantProtheses;
-    sumDevisSoins += deviItem.montantSoins;
+patientSchema.methods.calculateTotalDevis = function () {
+  let total = 0;
+  this.deviIds.forEach((devis) => {
+    total += devis.montant;
   });
-  this.montantAPayerProtheses = sumDevisProtheses;
-  this.montantAPayerSoins = sumDevisSoins;
-  this.montantAPaye = sumDevisProtheses + sumDevisSoins;
-}; */
+  this.totalDevis = total;
+};
 
-/* patientSchema.methods.totalPaiements = function () {
-  let sumRecetteSoins = this.report.recetteSoins ? this.report.recetteSoins : 0;
-  let sumRecetteProtheses = this.report.recetteProtheses
-    ? this.report.recetteProtheses
-    : 0;
-  this.paiementIds.map((paiement) => {
-    paiement.isSoins === true
-      ? (sumRecetteSoins += paiement.montant)
-      : (sumRecetteProtheses += paiement.montant);
+patientSchema.methods.calculateTotalPaiements = function () {
+  let total = 0;
+  this.paiementIds.forEach((paiement) => {
+    total += paiement.montant;
   });
-  this.montantPayeSoins = sumRecetteSoins;
-  this.montantPayeProtheses = sumRecetteProtheses;
-  this.montantPaye = sumRecetteSoins + sumRecetteProtheses;
-}; */
+  this.totalPaiements = total;
+};
 
 patientSchema.methods.calculateBalance = function () {
-  this.balance = this.montantAPayer - this.montantPaye;
+  this.balance = this.totalDevis - this.totalPaiements;
 };
 
 const Patient = mongoose.model("Patient", patientSchema);

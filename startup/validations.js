@@ -106,13 +106,12 @@ module.exports = {
   },
   paiement: (paiement) => {
     const schema = Joi.object({
+      numOrdre: Joi.number().allow(null).allow(""),
       patientId: Joi.objectId().required(),
-      numRecu: Joi.number().allow(""),
-      modePaiement: Joi.string().valid("Chèque", "Espèce"),
+      mode: Joi.string().valid("Chèque", "Espèce"),
       numCheque: Joi.string().allow(""),
-      datePaiement: Joi.date(),
+      date: Joi.date(),
       montant: Joi.number().required(),
-      natureActeId: Joi.string().required(),
     });
     return schema.validate(paiement);
   },

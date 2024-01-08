@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+
 const paiementSchema = new mongoose.Schema({
   patientId: {
     type: mongoose.Schema.Types.ObjectId,
