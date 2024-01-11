@@ -117,25 +117,29 @@ router.put("/:id", [auth, admin], async (req, res) => {
   if (!paiement)
     return res.status(404).send("le paiement avec cet id n'existe pas");
 
-  // add paiement to patient model after checking its existance
-  if (!patient.paiementIds.find((i) => (i = paiement._id))) {
-    patient.paiementIds.push({
-      paiementId: paiement._id,
-      montant: montant,
-    });
-  }
+  const updatePatient = await Patient.findOneAndUpdate(
+    { _id: patientId },
+    { $set: { "paiementIds.$[elem].montant": montant } },
+    { arrayFilters: [{ "elem.paiementId": paiement._id }], new: true }
+  );
 
-  patient.calculateTotalPaiements();
-  patient.calculateBalance();
+  if (!updatePatient)
+    return res.status(404).send("le patient avec cet id n'existe pas");
 
-  await patient.save();
+  updatePatient.calculateTotalPaiements();
+  updatePatient.calculateBalance();
+  await updatePatient.save();
   res.send(paiement);
 });
 
 router.get("/:id", async (req, res) => {
-  const paiement = await Paiement.findById(req.params.id).populate({
-    path: "medecinId",
-  });
+  const paiement = await Paiement.findById(req.params.id)
+    .populate({
+      path: "medecinId",
+    })
+    .populate({
+      path: "patientId",
+    });
   if (!paiement)
     return res.status(404).send("le paiement avec cet id n'existe pas");
   res.send(paiement);
@@ -147,11 +151,17 @@ router.delete("/:id", [auth, admin], async (req, res) => {
     return res.status(404).send("le paiement avec cet id n'existe pas");
 
   try {
-    await Patient.findByIdAndUpdate(paiement.patientId, {
-      $pull: { deviIds: { deviId: paiement._id } },
-      $inc: { totalPaiements: -paiement.montant },
-      $inc: { balance: +paiement.montant },
-    });
+    await Patient.updateOne(
+      { _id: paiement.patientId },
+      {
+        $pull: { paiementIds: { paiementId: paiement._id } },
+      }
+    );
+    const updatedPatient = await Patient.findById(paiement.patientId);
+
+    updatedPatient.calculateTotalPaiements();
+    updatedPatient.calculateBalance();
+    await updatedPatient.save();
   } catch (error) {
     console.log(error);
     return res.status(500).send("An error occurred");

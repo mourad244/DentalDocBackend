@@ -29,6 +29,7 @@ router.get("/", async (req, res) => {
 router.post("/", [auth, admin], async (req, res) => {
   const { error } = validations.devi(req.body);
   if (error) return res.status(400).send(error.details[0].message);
+
   const { patientId, medecinId, dateDevi, montant, acteEffectues } = req.body;
 
   const currentYear = new Date(dateDevi).getFullYear();
@@ -61,13 +62,13 @@ router.post("/", [auth, admin], async (req, res) => {
         acteDentaire.prix = acteEffectues[i].prix;
         await acteDentaire.save();
       }
+      if (acteEffectues[i].dentIds && acteEffectues[i].dentIds.length !== 0)
+        while (j < acteEffectues[i].dentIds.length) {
+          const dent = await Dent.findById(acteEffectues[i].dentIds[j]);
+          if (!dent) return res.status(400).send("Dent Invalide.");
+          j++;
+        }
     }
-    if (acteEffectues[i].dentIds && acteEffectues[i].dentIds.length !== 0)
-      while (j < acteEffectues[i].dentIds.length) {
-        const dent = await Dent.findById(acteEffectues[i].dentIds[j]);
-        if (!dent) return res.status(400).send("Dent Invalide.");
-        j++;
-      }
     i++;
   }
   const devi = new Devi({
@@ -85,7 +86,6 @@ router.post("/", [auth, admin], async (req, res) => {
 
   patient.calculateTotalDevis();
   patient.calculateBalance();
-
   await counter.save();
   await devi.save();
   await patient.save();
@@ -110,30 +110,23 @@ router.put("/:id", [auth, admin], async (req, res) => {
   let i = 0;
   let j = 0;
   while (i < acteEffectues.length) {
-    const acteDentaire = await ActeDentaire.findById(acteEffectues[i].acteId);
-    if (!acteDentaire) return res.status(400).send("acte Invalide.");
+    if (acteEffectues[i]) {
+      const acteDentaire = await ActeDentaire.findById(acteEffectues[i].acteId);
+      if (!acteDentaire) return res.status(400).send("acte Invalide.");
 
-    if (acteEffectues[i].dentIds && acteEffectues[i].dentIds.length != 0)
-      while (j < acteEffectues[i].dentIds.length) {
-        const dent = await Dent.findById(acteEffectues[i].dentIds[j]);
-        if (!dent) return res.status(400).send("Dent Invalide.");
-        j++;
+      if (acteDentaire.prix === null || acteDentaire.prix === undefined) {
+        acteDentaire.prix = acteEffectues[i].prix;
+        await acteDentaire.save();
       }
+      if (acteEffectues[i].dentIds && acteEffectues[i].dentIds.length != 0)
+        while (j < acteEffectues[i].dentIds.length) {
+          const dent = await Dent.findById(acteEffectues[i].dentIds[j]);
+          if (!dent) return res.status(400).send("Dent Invalide.");
+          j++;
+        }
+    }
     i++;
   }
-
-  /*  // calcule prix
-  const adherence = await Adherence.findById(patient.adherenceId);
-  if (adherence.nom == "A") adherence.nom = "FA";
-
-  let prix = 0;
-  for (let i = 0; i < acteEffectues.length; i++) {
-    const acteDentaire = await ActeDentaire.findById(acteEffectues[i].acteId);
-
-    if (acteEffectues[i].dentIds && acteEffectues[i].dentIds.length != 0)
-      prix += acteDentaire[adherence.nom] * acteEffectues[i].dentIds.length;
-    else prix += acteDentaire[adherence.nom];
-  } */
 
   const devi = await Devi.findByIdAndUpdate(
     req.params.id,
@@ -152,16 +145,17 @@ router.put("/:id", [auth, admin], async (req, res) => {
 
   if (!devi) return res.status(404).send("le devi avec cet id n'existe pas");
 
-  // add devi to patient model after checking existance
-  if (!patient.deviIds.find((i) => (i.deviId = devi._id))) {
-    patient.deviIds.push({ deviId: devi._id, montant: montant });
-    // patient.totalDevis();
-    // patient.calculateBalance();
-  }
-  patient.calculateTotalDevis();
-  patient.calculateBalance();
+  const updatedPatient = await Patient.findOneAndUpdate(
+    { _id: patientId },
+    { $set: { "deviIds.$[elem].montant": montant } },
+    { arrayFilters: [{ "elem.deviId": devi._id }], new: true }
+  );
+  if (!updatedPatient)
+    return res.status(404).send("Failed to update patient with devi montant.");
 
-  await patient.save();
+  updatedPatient.calculateTotalDevis();
+  updatedPatient.calculateBalance();
+  await updatedPatient.save();
   res.send(devi);
 });
 
@@ -197,13 +191,18 @@ router.get("/:id", async (req, res) => {
 router.delete("/:id", [auth, admin], async (req, res) => {
   const devi = await Devi.findByIdAndRemove(req.params.id);
   if (!devi) return res.status(404).send("le devi avec cet id n'existe pas");
-  // delete devi from patient model
   try {
-    await Patient.findByIdAndUpdate(devi.patientId, {
-      $pull: { deviIds: { deviId: devi._id } },
-      $inc: { totalDevis: -devi.montant },
-      $inc: { balance: -devi.montant },
-    });
+    await Patient.updateOne(
+      { _id: devi.patientId },
+      {
+        $pull: { deviIds: { deviId: devi._id } },
+      }
+    );
+    const updatedPatient = await Patient.findById(devi.patientId);
+
+    updatedPatient.calculateTotalDevis();
+    updatedPatient.calculateBalance();
+    await updatedPatient.save();
   } catch (error) {
     console.log(error);
     return res.status(500).send("An error occurred");
