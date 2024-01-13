@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 
 const paiementSchema = new mongoose.Schema({
+  numOrdre: {
+    type: Number,
+  },
   patientId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Patient",
-  },
-  numOrdre: {
-    Type: Number,
   },
   numCheque: {
     type: String,

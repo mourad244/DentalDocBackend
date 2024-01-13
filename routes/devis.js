@@ -79,6 +79,7 @@ router.post("/", [auth, admin], async (req, res) => {
     acteEffectues: acteEffectues,
     montant: montant,
   });
+
   patient.deviIds.push({
     deviId: devi._id,
     montant: montant,
@@ -86,6 +87,7 @@ router.post("/", [auth, admin], async (req, res) => {
 
   patient.calculateTotalDevis();
   patient.calculateBalance();
+
   await counter.save();
   await devi.save();
   await patient.save();

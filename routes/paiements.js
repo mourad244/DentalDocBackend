@@ -44,14 +44,8 @@ router.get("/", async (req, res) => {
 router.post("/", [auth, admin], async (req, res) => {
   const { error } = validations.paiement(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  const {
-    patientId,
-    numCheque,
-    mode,
-    date,
-    montant,
-    // isSoins,
-  } = req.body;
+  const { patientId, numCheque, mode, date, montant } = req.body;
+
   const currentYear = new Date(date).getFullYear();
   let counter = await CounterPaiement.findOne({ year: currentYear });
   if (!counter) {
@@ -65,14 +59,14 @@ router.post("/", [auth, admin], async (req, res) => {
   // validation to delete if sure they are called just before
   const patient = await Patient.findById(patientId);
   if (!patient) return res.status(400).send("Patient Invalide.");
-
+  console.log("numOrdre", numOrdre);
   const paiement = new Paiement({
-    patientId: patientId,
-    numOrdre: numOrdre,
-    mode: mode,
-    numCheque: numCheque,
-    date: date,
-    montant: montant,
+    numOrdre,
+    patientId,
+    mode,
+    numCheque,
+    date,
+    montant,
   });
 
   patient.paiementIds.push({
@@ -84,8 +78,9 @@ router.post("/", [auth, admin], async (req, res) => {
   patient.calculateBalance();
 
   await counter.save();
-  await patient.save();
+  console.log("paiement", paiement);
   await paiement.save();
+  await patient.save();
   res.send(paiement);
 });
 
