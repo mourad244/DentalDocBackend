@@ -100,6 +100,7 @@ module.exports = {
       medecinId: Joi.objectId().required(),
       dateDevi: Joi.date(),
       montant: Joi.number().allow("").allow(null),
+      rdvIds: Joi.array(),
       acteEffectues: Joi.array(),
     });
     return schema.validate(devi);
@@ -122,6 +123,11 @@ module.exports = {
       datePrevu: Joi.date().required(),
       description: Joi.string().allow(""),
       isHonnore: Joi.boolean().allow(null),
+      isAnnule: Joi.boolean().allow(null),
+      isReporte: Joi.boolean().allow(null),
+      dateNouveauRdv: Joi.date().allow(null).allow(""),
+      deviId: Joi.objectId().allow(null).allow(""),
+      __v: Joi.number(),
     });
     return schema.validate(rdv);
   },

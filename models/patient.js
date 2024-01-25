@@ -128,10 +128,10 @@ const patientSchema = new mongoose.Schema({
     date: {
       type: Date,
     },
-    medecinId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Medecin",
-    },
+    // medecinId: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "Medecin",
+    // },
   },
   // report: {
   //   actes: Number,

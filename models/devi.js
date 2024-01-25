@@ -24,6 +24,7 @@ const deviSchema = new mongoose.Schema({
   montant: {
     type: Number,
   },
+  rdvIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "Rdv" }],
   acteEffectues: [
     {
       acteId: { type: mongoose.Schema.Types.ObjectId, ref: "ActeDentaire" },

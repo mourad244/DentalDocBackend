@@ -21,6 +21,21 @@ const rdvSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  isAnnule: {
+    type: Boolean,
+    default: false,
+  },
+  isReporte: {
+    type: Boolean,
+    default: false,
+  },
+  dateNouveauRdv: {
+    type: Date,
+  },
+  deviId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Devi",
+  },
 });
 const Rdv = mongoose.model("Rdv", rdvSchema);
 

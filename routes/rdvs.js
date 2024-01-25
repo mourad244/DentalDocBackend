@@ -20,17 +20,20 @@ router.get("/", async (req, res) => {
     //   path: "medecinId",
     //   select: "nom",
     // })
-
+    .populate({
+      path: "deviId",
+      select: "numOrdre",
+    })
     .sort("datePrevu");
   res.send(rdvs);
 });
 
 router.post("/", [auth, admin], async (req, res) => {
   const { error } = validations.rdv(req.body);
+  // console.log(error);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const { patientId, /* medecinId, */ datePrevu, description, isHonnore } =
-    req.body;
+  const { patientId, datePrevu, description, isHonnore } = req.body;
 
   // validation to delete if sure they are called just before
 
@@ -39,15 +42,13 @@ router.post("/", [auth, admin], async (req, res) => {
   // const medecin = await Medecin.findById(medecinId);
   // if (!medecin) return res.status(400).send("Medecin Invalide.");
   const rdv = new Rdv({
-    patientId: patientId,
-    // medecinId: medecinId,
-    datePrevu: datePrevu,
-    description: description,
+    patientId,
+    datePrevu,
+    description,
     isHonnore: isHonnore === null ? undefined : isHonnore,
   });
   patient.prochainRdv = {
     date: datePrevu,
-    // medecinId: medecinId,
   };
   await rdv.save();
   await patient.save();
@@ -57,27 +58,47 @@ router.post("/", [auth, admin], async (req, res) => {
 router.put("/:id", [auth, admin], async (req, res) => {
   const { error } = validations.rdv(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  const { patientId, /* medecinId, */ datePrevu, description, isHonnore } =
-    req.body;
+  const {
+    patientId,
+    datePrevu,
+    description,
+    isHonnore,
+    isAnnule,
+    isReporte,
+    dateNouveauRdv,
+  } = req.body;
   // validation to delete if sure they are called just before
   const patient = await Patient.findById(patientId);
   if (!patient) return res.status(400).send("Patient Invalide.");
-  // const medecin = await Medecin.findById(medecinId);
-  // if (!medecin) return res.status(400).send("Medecin Invalide.");
   const rdv = await Rdv.findByIdAndUpdate(
     req.params.id,
     {
-      patientId: patientId,
-      // medecinId: medecinId,
-      datePrevu: datePrevu,
+      patientId,
+      datePrevu,
       description: description ? description : "",
-      isHonnore: isHonnore,
+      isHonnore,
+      isAnnule,
+      isReporte,
+      dateNouveauRdv,
     },
     {
       new: true,
     }
   );
-
+  if (
+    (isAnnule || isReporte) &&
+    new Date(patient.prochainRdv.date).getFullYear() ===
+      new Date(rdv.datePrevu).getFullYear() &&
+    new Date(patient.prochainRdv.date).getMonth() ===
+      new Date(rdv.datePrevu).getMonth() &&
+    new Date(patient.prochainRdv.date).getDate() ===
+      new Date(rdv.datePrevu).getDate()
+  ) {
+    patient.prochainRdv = {
+      date: "",
+    };
+    await patient.save();
+  }
   if (!rdv) return res.status(404).send("le rdv avec cet id n'existe pas");
 
   res.send(rdv);

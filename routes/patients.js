@@ -19,9 +19,9 @@ router.get("/", async (req, res) => {
   const patients = await Patient.find()
     .populate({
       path: "prochainRdv",
-      populate: {
-        path: "medecinId",
-      },
+      // populate: {
+      //   path: "medecinId",
+      // },
     })
     .populate({
       path: "deviIds",
@@ -199,7 +199,31 @@ router.put("/:id", [auth, admin], async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-  const patient = await Patient.findById(req.params.id);
+  console.log("onde");
+  console.log("id", req.params.id);
+  const patient = await Patient.findById(req.params.id)
+    .populate({
+      path: "deviIds",
+      populate: {
+        path: "deviId",
+        populate: {
+          path: "acteEffectues",
+          populate: {
+            path: "acteId",
+            populate: {
+              path: "natureId",
+              select: "nom",
+            },
+          },
+        },
+      },
+    })
+    .populate({
+      path: "paiementIds",
+      populate: {
+        path: "paiementId",
+      },
+    });
   if (!patient)
     return res.status(404).send("le patient avec cet id n'existe pas");
   res.send(patient);

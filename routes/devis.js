@@ -1,5 +1,6 @@
 const express = require("express");
 
+const { Rdv } = require("../models/rdv");
 const { Devi } = require("../models/devi");
 const { Dent } = require("../models/dent");
 const { Patient } = require("../models/patient");
@@ -15,13 +16,13 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   const devis = await Devi.find()
-    // .populate("medecinId")
     .populate({
       path: "medecinId",
     })
     .populate({
       path: "patientId",
     })
+    .populate("rdvIds")
     .sort("numOrdre");
   res.send(devis);
 });
@@ -30,7 +31,8 @@ router.post("/", [auth, admin], async (req, res) => {
   const { error } = validations.devi(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const { patientId, medecinId, dateDevi, montant, acteEffectues } = req.body;
+  const { patientId, medecinId, dateDevi, montant, acteEffectues, rdvIds } =
+    req.body;
 
   const currentYear = new Date(dateDevi).getFullYear();
   let counter = await CounterDevi.findOne({ year: currentYear });
@@ -49,6 +51,7 @@ router.post("/", [auth, admin], async (req, res) => {
     const medecin = await Medecin.findById(medecinId);
     if (!medecin) return res.status(400).send("Medecin Invalide.");
   }
+
   // validations
 
   let i = 0;
@@ -78,12 +81,27 @@ router.post("/", [auth, admin], async (req, res) => {
     dateDevi: dateDevi,
     acteEffectues: acteEffectues,
     montant: montant,
+    rdvIds: rdvIds,
   });
 
   patient.deviIds.push({
     deviId: devi._id,
     montant: montant,
   });
+  //  for each rdvId in rdvIds, update the rdv with deviId
+  if (rdvIds && rdvIds.length !== 0) {
+    let i = 0;
+    while (i < rdvIds.length) {
+      const rdv = await Rdv.findById(rdvIds[i]);
+      if (!rdv) return res.status(400).send("Rdv Invalide.");
+      rdv.deviId = devi._id;
+      rdv.isHonnore = true;
+      rdv.isReporte = false;
+      rdv.isAnnule = false;
+      await rdv.save();
+      i++;
+    }
+  }
 
   patient.calculateTotalDevis();
   patient.calculateBalance();
@@ -204,6 +222,17 @@ router.delete("/:id", [auth, admin], async (req, res) => {
 
     updatedPatient.calculateTotalDevis();
     updatedPatient.calculateBalance();
+    // delete deviId from rdv
+    if (devi.rdvIds && devi.rdvIds.length !== 0) {
+      let i = 0;
+      while (i < devi.rdvIds.length) {
+        const rdv = await Rdv.findById(devi.rdvIds[i]);
+        if (!rdv) return res.status(400).send("Rdv Invalide.");
+        rdv.deviId = null;
+        await rdv.save();
+        i++;
+      }
+    }
     await updatedPatient.save();
   } catch (error) {
     console.log(error);
