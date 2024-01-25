@@ -45,8 +45,8 @@ module.exports = function (app) {
   app.use("/dentaldoc/users", users);
   app.use("/dentaldoc/roles", roles);
   app.use("/dentaldoc/dents", dents);
-    app.use("/dentaldoc/regions", regions);
-    app.use("/dentaldoc/provinces", provinces);
+  app.use("/dentaldoc/regions", regions);
+  app.use("/dentaldoc/provinces", provinces);
   app.use("/dentaldoc/medecins", medecins);
   app.use("/dentaldoc/cabinets", cabinets);
   app.use("/dentaldoc/allergies", allergies);
