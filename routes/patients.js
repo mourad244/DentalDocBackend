@@ -199,8 +199,6 @@ router.put("/:id", [auth, admin], async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-  console.log("onde");
-  console.log("id", req.params.id);
   const patient = await Patient.findById(req.params.id)
     .populate({
       path: "deviIds",

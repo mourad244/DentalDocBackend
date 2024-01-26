@@ -7,13 +7,11 @@ const patientSchema = new mongoose.Schema({
   numOrdre: {
     type: Number,
   },
-
   nom: {
     type: String,
     required: true,
     maxlength: 50,
   },
-
   prenom: {
     type: String,
     required: true,
@@ -21,12 +19,9 @@ const patientSchema = new mongoose.Schema({
   },
   dateNaissance: {
     type: Date,
-    // required: true,
   },
-  // num_cabinet ,
   cin: {
     type: String,
-    // unique: true,
   },
   profession: {
     type: String,
@@ -65,7 +60,6 @@ const patientSchema = new mongoose.Schema({
       },
     },
   ],
-
   historiqueMedecins: [
     {
       medecinId: {
@@ -76,10 +70,8 @@ const patientSchema = new mongoose.Schema({
       dateFin: Date,
     },
   ],
-
   isMasculin: {
     type: Boolean,
-    // required: true,
   },
   regionId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -97,15 +89,10 @@ const patientSchema = new mongoose.Schema({
     type: String,
     maxlength: 255,
   },
-  // n°_autorisation,
-
   dateCreation: {
     type: Date,
     // default: Date.now,
   },
-
-  // num_devis ,
-
   deviIds: [
     {
       deviId: {
@@ -128,19 +115,7 @@ const patientSchema = new mongoose.Schema({
     date: {
       type: Date,
     },
-    // medecinId: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Medecin",
-    // },
   },
-  // report: {
-  //   actes: Number,
-  //   recettes: Number,
-  //   isAJour: {
-  //     type: Boolean,
-  //     default: false,
-  //   },
-  // },
 
   totalDevis: {
     type: Number,

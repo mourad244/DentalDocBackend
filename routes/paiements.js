@@ -59,7 +59,6 @@ router.post("/", [auth, admin], async (req, res) => {
   // validation to delete if sure they are called just before
   const patient = await Patient.findById(patientId);
   if (!patient) return res.status(400).send("Patient Invalide.");
-  console.log("numOrdre", numOrdre);
   const paiement = new Paiement({
     numOrdre,
     patientId,
@@ -78,7 +77,6 @@ router.post("/", [auth, admin], async (req, res) => {
   patient.calculateBalance();
 
   await counter.save();
-  console.log("paiement", paiement);
   await paiement.save();
   await patient.save();
   res.send(paiement);
