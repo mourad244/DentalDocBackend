@@ -26,6 +26,9 @@ const patientSchema = new mongoose.Schema({
   profession: {
     type: String,
   },
+  images: {
+    type: Array,
+  },
   couvertureId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Couverture",
@@ -88,10 +91,6 @@ const patientSchema = new mongoose.Schema({
   ville: {
     type: String,
     maxlength: 255,
-  },
-  dateCreation: {
-    type: Date,
-    // default: Date.now,
   },
   deviIds: [
     {

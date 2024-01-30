@@ -3,3 +3,6 @@ node_modules
 logs/
 *.log
 acteDentaireData.csv
+
+images/
+images/compressed/
