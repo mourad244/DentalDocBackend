@@ -54,7 +54,6 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", [auth, admin], async (req, res) => {
-  console.log("post");
   try {
     await uploadImages(req, res);
   } catch (err) {
@@ -151,7 +150,6 @@ router.post("/", [auth, admin], async (req, res) => {
 });
 
 router.put("/:id", [auth, admin], async (req, res) => {
-  console.log("put");
   try {
     await uploadImages(req, res);
   } catch (error) {
