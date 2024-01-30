@@ -4,5 +4,5 @@ logs/
 *.log
 acteDentaireData.csv
 
-# images/
-# images/compressed/
+images/
+images/compressed/
