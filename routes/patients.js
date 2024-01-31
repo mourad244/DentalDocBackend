@@ -192,35 +192,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
 
   const { image: images } = getPathData(req.files);
   if (images) compressImage(images);
-  // if (couvertureId) {
-  //   const couverture = await Couverture.findById(couvertureId);
-  //   if (!couverture) return res.status(400).send("Couverture invalide");
-  // }
-  // if (detailCouvertureId) {
-  //   const detailCouverture = await DetailCouverture.findById(
-  //     detailCouvertureId
-  //   );
-  //   if (!detailCouverture)
-  //     return res.status(400).send("DetailCouverture invalide");
-  // }
-  // if (medicamentIds) {
-  //   medicamentIds.map(async (medicamentId) => {
-  //     const medicament = await Medicament.findById(medicamentId);
-  //     if (!medicament) return res.status(400).send("Medicament invalide");
-  //   });
-  // }
-  // if (pathologieIds) {
-  //   pathologieIds.map(async (pathologieId) => {
-  //     const pathologie = await Pathologie.findById(pathologieId);
-  //     if (!pathologie) return res.status(400).send("Pathologie invalide");
-  //   });
-  // }
-  // if (allergieIds) {
-  //   allergieIds.map(async (allergieId) => {
-  //     const allergie = await Allergie.findById(allergieId);
-  //     if (!allergie) return res.status(400).send("Allergie invalide");
-  //   });
-  // }
+
   const patient = await Patient.findById(req.params.id);
   if (!patient) {
     return res.status(404).send("Patient not found");
