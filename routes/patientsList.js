@@ -12,6 +12,7 @@ router.get("/", async (req, res) => {
   const patients = await Patient.find().select(
     " dateNaissance isMasculin  profession cin prochainRdv  nom numOrdre prenom telephone regionId provinceId "
   );
+
   res.send(patients);
 });
 

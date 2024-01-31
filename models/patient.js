@@ -132,6 +132,7 @@ const patientSchema = new mongoose.Schema({
 patientSchema.methods.calculateTotalDevis = function () {
   let total = 0;
   this.deviIds.forEach((devi) => {
+    console.log("devi", devi);
     total += devi.montant;
   });
   this.totalDevis = total;
@@ -140,6 +141,7 @@ patientSchema.methods.calculateTotalDevis = function () {
 patientSchema.methods.calculateTotalPaiements = function () {
   let total = 0;
   this.paiementIds.forEach((paiement) => {
+    console.log("paiement", paiement);
     total += paiement.montant;
   });
   this.totalPaiements = total;

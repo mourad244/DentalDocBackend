@@ -12,6 +12,12 @@ const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 const validations = require("../startup/validations");
 
+const getPathData = require("../middleware/getPathData");
+const compressImage = require("../utils/compressImage");
+const uploadImages = require("../middleware/uploadImages");
+const deleteImages = require("../middleware/deleteImages");
+const deleteIndexedImages = require("../middleware/deleteIndexedImages");
+
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -28,12 +34,27 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", [auth, admin], async (req, res) => {
+  try {
+    await uploadImages(req, res);
+  } catch (err) {
+    res.status(500).send({
+      message: `Could not upload the images: ${req.files.originalname}. ${err}`,
+    });
+  }
   const { error } = validations.devi(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  if (error) {
+    deleteImages(req.files);
+    return res.status(400).send(error.details[0].message);
+  }
 
   const { patientId, medecinId, dateDevi, montant, acteEffectues, rdvIds } =
     req.body;
 
+  const { image: images } = getPathData(req.files);
+  if (images) compressImage(images);
+  const newImages = images
+    ? images.map((image) => image.destination + "/compressed/" + image.filename)
+    : [];
   const currentYear = new Date(dateDevi).getFullYear();
   let counter = await CounterDevi.findOne({ year: currentYear });
   if (!counter) {
@@ -82,8 +103,8 @@ router.post("/", [auth, admin], async (req, res) => {
     acteEffectues: acteEffectues,
     montant: montant,
     rdvIds: rdvIds,
+    images: newImages,
   });
-
   patient.deviIds.push({
     deviId: devi._id,
     montant: montant,
@@ -113,11 +134,41 @@ router.post("/", [auth, admin], async (req, res) => {
 });
 
 router.put("/:id", [auth, admin], async (req, res) => {
-  const { error } = validations.devi(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  try {
+    await uploadImages(req, res);
+  } catch (error) {
+    res.status(500).send({
+      message: `Could not upload the images: ${req.files.originalname}. ${error}`,
+    });
+  }
 
-  const { numOrdre, patientId, medecinId, dateDevi, montant, acteEffectues } =
-    req.body;
+  const { error } = validations.devi(req.body);
+  if (error) {
+    deleteImages(req.files);
+    return res.status(400).send(error.details[0].message);
+  }
+
+  const {
+    numOrdre,
+    patientId,
+    medecinId,
+    dateDevi,
+    montant,
+    acteEffectues,
+    imagesDeletedIndex,
+  } = req.body;
+  const { image: images } = getPathData(req.files);
+  if (images) compressImage(images);
+  const newImages = images
+    ? images.map((image) => image.destination + "/compressed/" + image.filename)
+    : [];
+  // Merge old and new images, excluding deleted ones
+  const updatedImages =
+    imagesDeletedIndex && imagesDeletedIndex.length !== 0
+      ? patient.images.filter((_, index) => !imagesDeletedIndex.includes(index))
+      : patient.images;
+
+  updatedImages.push(...newImages);
 
   // validation to delete if sure they are called just before
   const patient = await Patient.findById(patientId);
@@ -157,6 +208,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
       dateDevi,
       acteEffectues,
       montant,
+      images: updatedImages,
     },
     {
       new: true,
@@ -211,6 +263,7 @@ router.get("/:id", async (req, res) => {
 router.delete("/:id", [auth, admin], async (req, res) => {
   const devi = await Devi.findByIdAndRemove(req.params.id);
   if (!devi) return res.status(404).send("le devi avec cet id n'existe pas");
+  if (devi.images) deleteImages(devi.images);
   try {
     await Patient.updateOne(
       { _id: devi.patientId },
@@ -235,7 +288,6 @@ router.delete("/:id", [auth, admin], async (req, res) => {
     }
     await updatedPatient.save();
   } catch (error) {
-    console.log(error);
     return res.status(500).send("An error occurred");
   }
 

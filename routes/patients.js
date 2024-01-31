@@ -4,18 +4,20 @@ const { Patient } = require("../models/patient");
 const { Devi } = require("../models/devi");
 const { Medecin } = require("../models/medecin");
 
-const auth = require("../middleware/auth");
-const admin = require("../middleware/admin");
-const validations = require("../startup/validations");
 const { Couverture } = require("../models/couverture");
 const { Allergie } = require("../models/allergie");
 const { Pathologie } = require("../models/pathologie");
 const { Medicament } = require("../models/medicament");
+const { DetailCouverture } = require("../models/detailCouverture");
+
+const auth = require("../middleware/auth");
+const admin = require("../middleware/admin");
+const validations = require("../startup/validations");
+
 const getPathData = require("../middleware/getPathData");
 const compressImage = require("../utils/compressImage");
 const uploadImages = require("../middleware/uploadImages");
 const deleteImages = require("../middleware/deleteImages");
-const { DetailCouverture } = require("../models/detailCouverture");
 const deleteIndexedImages = require("../middleware/deleteIndexedImages");
 
 const router = express.Router();
