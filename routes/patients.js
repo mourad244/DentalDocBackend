@@ -14,6 +14,7 @@ const { Medicament } = require("../models/medicament");
 const getPathData = require("../middleware/getPathData");
 const compressImage = require("../utils/compressImage");
 const uploadImages = require("../middleware/uploadImages");
+const deleteImages = require("../middleware/deleteImages");
 const { DetailCouverture } = require("../models/detailCouverture");
 const deleteIndexedImages = require("../middleware/deleteIndexedImages");
 
@@ -159,7 +160,6 @@ router.put("/:id", [auth, admin], async (req, res) => {
     });
   }
   const { error } = validations.patient(req.body);
-  console.log("done1");
   if (error) {
     deleteImages(req.files);
     return res.status(400).send(error.details[0].message);
@@ -195,7 +195,6 @@ router.put("/:id", [auth, admin], async (req, res) => {
   if (images) compressImage(images);
 
   const patient = await Patient.findById(req.params.id);
-  console.log("done2");
 
   if (!patient) {
     return res.status(404).send("Patient not found");
@@ -203,7 +202,6 @@ router.put("/:id", [auth, admin], async (req, res) => {
   const newImages = images
     ? images.map((image) => image.destination + "/compressed/" + image.filename)
     : [];
-  console.log("done3");
 
   // Merge old and new images, excluding deleted ones
   const updatedImages =
@@ -233,7 +231,6 @@ router.put("/:id", [auth, admin], async (req, res) => {
     images: updatedImages,
   };
   await Patient.findByIdAndUpdate(req.params.id, updatedPatientData);
-  console.log("done4");
 
   res.send(patient);
 });
