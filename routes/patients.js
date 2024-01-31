@@ -154,7 +154,6 @@ router.put("/:id", [auth, admin], async (req, res) => {
   try {
     await uploadImages(req, res);
   } catch (error) {
-    console.log("error1", error);
     res.status(500).send({
       message: `Could not upload the images: ${req.files.originalname}. ${error}`,
     });
@@ -268,7 +267,7 @@ router.delete("/:id", [auth, admin], async (req, res) => {
   const patient = await Patient.findByIdAndRemove(req.params.id);
   if (!patient)
     return res.status(404).send("le patient avec cet id n'existe pas");
-  if (patient.images) deteleImages(patient.images);
+  if (patient.images) deleteImages(patient.images);
   res.send(patient);
 });
 

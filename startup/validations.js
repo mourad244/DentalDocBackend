@@ -100,6 +100,8 @@ module.exports = {
       patientId: Joi.objectId().required(),
       medecinId: Joi.objectId().required(),
       dateDevi: Joi.date(),
+      images: Joi.array(),
+      imagesDeletedIndex: Joi.array(),
       montant: Joi.number().allow("").allow(null),
       rdvIds: Joi.array(),
       acteEffectues: Joi.array(),
