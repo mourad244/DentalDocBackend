@@ -12,9 +12,7 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   const paiements = await Paiement.find()
-    .populate({
-      path: "medecinId",
-    })
+
     .populate({
       path: "patientId",
       select: "  nom prenom date",

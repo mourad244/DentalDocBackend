@@ -20,7 +20,15 @@ const acteDentaireSchema = new mongoose.Schema({
 
     maxlength: 50,
   },
-  
+  // donne moi une variable qui signifie le temps nécéssaire pour faire cet acte
+  duree: {
+    type: Number,
+    required: true,
+  },
+  // donne moi une variable qui signifie les moments préférables pour faire cet acte, matin, après midi,
+  moments: {
+    type: [String],
+  },
 });
 const ActeDentaire = mongoose.model("ActeDentaire", acteDentaireSchema);
 

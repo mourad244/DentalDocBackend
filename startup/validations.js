@@ -42,6 +42,8 @@ module.exports = {
       natureId: Joi.objectId().allow(""),
       code: Joi.number().allow(""),
       prix: Joi.number().allow(""),
+      duree: Joi.number().allow(""),
+      moments: Joi.array(),
     });
     return schema.validate(acteDentaire);
   },
