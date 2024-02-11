@@ -54,7 +54,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const pathologie = await Pathologie.findByIdAndRemove(req.params.id);
+  const pathologie = await Pathologie.findOneAndDelete(req.params.id);
   if (!pathologie)
     return res.status(404).send("pathologie avec cet id n'existe pas");
 

@@ -56,7 +56,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const medicament = await Medicament.findByIdAndRemove(req.params.id);
+  const medicament = await Medicament.findOneAndDelete(req.params.id);
   if (!medicament)
     return res.status(404).send("medicament avec cet id n'existe pas");
 

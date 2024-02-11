@@ -1,10 +1,6 @@
 const mongoose = require("mongoose");
 
 const rdvSchema = new mongoose.Schema({
-  medecinId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Medecin",
-  },
   patientId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Patient",
@@ -35,6 +31,32 @@ const rdvSchema = new mongoose.Schema({
   deviId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Devi",
+  },
+  // heure de debut et heure de fin
+
+  natureId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "NatureActe",
+  },
+  acteId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "ActeDentaire",
+  },
+  heureDebut: {
+    heure: {
+      type: Number,
+    },
+    minute: {
+      type: Number,
+    },
+  },
+  heureFin: {
+    heure: {
+      type: Number,
+    },
+    minute: {
+      type: Number,
+    },
   },
 });
 const Rdv = mongoose.model("Rdv", rdvSchema);

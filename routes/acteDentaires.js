@@ -79,7 +79,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const acteDentaire = await ActeDentaire.findByIdAndRemove(req.params.id);
+  const acteDentaire = await ActeDentaire.findOneAndDelete(req.params.id);
   if (!acteDentaire)
     return res.status(404).send("le acteDentaire avec cet id n'existe pas");
   res.send(acteDentaire);

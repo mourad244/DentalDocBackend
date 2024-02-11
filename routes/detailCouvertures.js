@@ -53,7 +53,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const detailCouverture = await DetailCouverture.findByIdAndRemove(
+  const detailCouverture = await DetailCouverture.findOneAndDelete(
     req.params.id
   );
   if (!detailCouverture)

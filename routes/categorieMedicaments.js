@@ -50,7 +50,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const categorieMedicament = await CategorieMedicament.findByIdAndRemove(
+  const categorieMedicament = await CategorieMedicament.findOneAndDelete(
     req.params.id
   );
   if (!categorieMedicament)

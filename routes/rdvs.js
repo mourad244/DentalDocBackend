@@ -33,7 +33,8 @@ router.post("/", [auth, admin], async (req, res) => {
   // console.log(error);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const { patientId, datePrevu, description, isHonnore } = req.body;
+  const { patientId, datePrevu, description, isHonnore, heureDebut, heureFin } =
+    req.body;
 
   // validation to delete if sure they are called just before
 
@@ -46,6 +47,8 @@ router.post("/", [auth, admin], async (req, res) => {
     datePrevu,
     description,
     isHonnore: isHonnore === null ? undefined : isHonnore,
+    heureDebut,
+    heureFin,
   });
   patient.prochainRdv = {
     date: datePrevu,
@@ -65,6 +68,8 @@ router.put("/:id", [auth, admin], async (req, res) => {
     isHonnore,
     isAnnule,
     isReporte,
+    heureFin,
+    heureDebut,
     dateNouveauRdv,
   } = req.body;
   // validation to delete if sure they are called just before
@@ -79,6 +84,8 @@ router.put("/:id", [auth, admin], async (req, res) => {
       isHonnore,
       isAnnule,
       isReporte,
+      heureFin,
+      heureDebut,
       dateNouveauRdv,
     },
     {
@@ -114,7 +121,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const rdv = await Rdv.findByIdAndRemove(req.params.id);
+  const rdv = await Rdv.findOneAndDelete({ _id: req.params.id });
   if (!rdv) return res.status(404).send("le rdv avec cet id n'existe pas");
 
   const patient = await Patient.findById(rdv.patientId);

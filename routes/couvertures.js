@@ -50,7 +50,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const couverture = await Couverture.findByIdAndRemove(req.params.id);
+  const couverture = await Couverture.findOneAndDelete(req.params.id);
   if (!couverture)
     return res.status(404).send("couverture avec cet id n'existe pas");
   // delete detailCouverture having couvertureId = couverture._id

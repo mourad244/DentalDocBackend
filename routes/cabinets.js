@@ -46,7 +46,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const cabinet = await Cabinet.findByIdAndRemove(req.params.id);
+  const cabinet = await Cabinet.findOneAndDelete(req.params.id);
   if (!cabinet)
     return res.status(404).send("le cabinet avec cet id n'existe pas");
   res.send(cabinet);

@@ -46,7 +46,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const natureActe = await NatureActe.findByIdAndRemove(req.params.id);
+  const natureActe = await NatureActe.findOneAndDelete(req.params.id);
   if (!natureActe)
     return res.status(404).send("la nature de l'acte avec cet id n'existe pas");
   res.send(natureActe);

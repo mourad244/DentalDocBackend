@@ -46,7 +46,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const specialiteMedecin = await SpecialiteMedecin.findByIdAndRemove(
+  const specialiteMedecin = await SpecialiteMedecin.findOneAndDelete(
     req.params.id
   );
   if (!specialiteMedecin)

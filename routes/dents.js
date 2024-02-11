@@ -45,7 +45,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const dent = await Dent.findByIdAndRemove(req.params.id);
+  const dent = await Dent.findOneAndDelete(req.params.id);
   if (!dent) return res.status(404).send("dent avec cet id n'existe pas");
   res.send(dent);
 });
