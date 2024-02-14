@@ -32,8 +32,6 @@ const rdvSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Devi",
   },
-  // heure de debut et heure de fin
-
   natureId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "NatureActe",

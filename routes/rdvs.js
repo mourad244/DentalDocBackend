@@ -16,10 +16,6 @@ router.get("/", async (req, res) => {
       path: "patientId",
       select: "nom prenom telephone",
     })
-    // .populate({
-    //   path: "medecinId",
-    //   select: "nom",
-    // })
     .populate({
       path: "deviId",
       select: "numOrdre",
@@ -33,8 +29,16 @@ router.post("/", [auth, admin], async (req, res) => {
   // console.log(error);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const { patientId, datePrevu, description, isHonnore, heureDebut, heureFin } =
-    req.body;
+  const {
+    patientId,
+    datePrevu,
+    description,
+    isHonnore,
+    heureDebut,
+    heureFin,
+    natureId,
+    acteId,
+  } = req.body;
 
   // validation to delete if sure they are called just before
 
@@ -49,6 +53,8 @@ router.post("/", [auth, admin], async (req, res) => {
     isHonnore: isHonnore === null ? undefined : isHonnore,
     heureDebut,
     heureFin,
+    natureId: !natureId ? undefined : natureId,
+    acteId: !acteId ? undefined : acteId,
   });
   patient.prochainRdv = {
     date: datePrevu,
@@ -71,6 +77,8 @@ router.put("/:id", [auth, admin], async (req, res) => {
     heureFin,
     heureDebut,
     dateNouveauRdv,
+    natureId,
+    acteId,
   } = req.body;
   // validation to delete if sure they are called just before
   const patient = await Patient.findById(patientId);
@@ -87,6 +95,8 @@ router.put("/:id", [auth, admin], async (req, res) => {
       heureFin,
       heureDebut,
       dateNouveauRdv,
+      natureId: !natureId ? undefined : natureId,
+      acteId: !acteId ? undefined : acteId,
     },
     {
       new: true,

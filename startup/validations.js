@@ -132,6 +132,8 @@ module.exports = {
       isReporte: Joi.boolean().allow(null),
       dateNouveauRdv: Joi.date().allow(null).allow(""),
       deviId: Joi.objectId().allow(null).allow(""),
+      natureId: Joi.objectId().allow(null).allow(""),
+      acteId: Joi.objectId().allow(null).allow(""),
       heureDebut: Joi.object(),
       heureFin: Joi.object(),
       __v: Joi.number(),
