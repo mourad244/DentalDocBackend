@@ -25,6 +25,10 @@ const rdvSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  lastRdvId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Rdv",
+  },
   dateNouveauRdv: {
     type: Date,
   },

@@ -36,6 +36,7 @@ router.post("/", [auth, admin], async (req, res) => {
     isHonnore,
     heureDebut,
     heureFin,
+    lastRdvId,
     natureId,
     acteId,
   } = req.body;
@@ -53,6 +54,7 @@ router.post("/", [auth, admin], async (req, res) => {
     isHonnore: isHonnore === null ? undefined : isHonnore,
     heureDebut,
     heureFin,
+    lastRdvId: !lastRdvId ? undefined : lastRdvId,
     natureId: !natureId ? undefined : natureId,
     acteId: !acteId ? undefined : acteId,
   });
@@ -73,6 +75,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
     description,
     isHonnore,
     isAnnule,
+    lastRdvId,
     isReporte,
     heureFin,
     heureDebut,
@@ -92,6 +95,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
       isHonnore,
       isAnnule,
       isReporte,
+      lastRdvId: !lastRdvId ? undefined : lastRdvId,
       heureFin,
       heureDebut,
       dateNouveauRdv,
@@ -115,6 +119,20 @@ router.put("/:id", [auth, admin], async (req, res) => {
       date: "",
     };
     await patient.save();
+  }
+  if (lastRdvId) {
+    const lastRdv = await Rdv.findById(lastRdvId);
+    if (
+      new Date(lastRdv.datePrevu).getFullYear() !==
+        new Date(rdv.datePrevu).getFullYear() ||
+      new Date(lastRdv.datePrevu).getMonth() !==
+        new Date(rdv.datePrevu).getMonth() ||
+      new Date(lastRdv.datePrevu).getDate() !==
+        new Date(rdv.datePrevu).getDate()
+    ) {
+      lastRdv.dateNouveauRdv = rdv.datePrevu;
+      await lastRdv.save();
+    }
   }
   if (!rdv) return res.status(404).send("le rdv avec cet id n'existe pas");
 

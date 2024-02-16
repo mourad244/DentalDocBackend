@@ -134,6 +134,7 @@ module.exports = {
       deviId: Joi.objectId().allow(null).allow(""),
       natureId: Joi.objectId().allow(null).allow(""),
       acteId: Joi.objectId().allow(null).allow(""),
+      lastRdvId: Joi.objectId().allow(null).allow(""),
       heureDebut: Joi.object(),
       heureFin: Joi.object(),
       __v: Joi.number(),
