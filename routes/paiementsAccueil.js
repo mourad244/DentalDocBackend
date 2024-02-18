@@ -10,10 +10,7 @@ router.get(
   /*  [auth], */ async (req, res) => {
     const paiements = await Paiement.find()
       .select("medecinId montant natureActeId patientId datePaiement -_id")
-      .populate({
-        path: "patientId",
-        select: "adherenceId -_id",
-      })
+
       .populate({
         path: "natureActeId",
         select: "nom -_id",
