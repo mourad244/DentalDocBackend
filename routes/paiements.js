@@ -125,12 +125,9 @@ router.put("/:id", [auth, admin], async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   const paiement = await Paiement.findById(req.params.id)
-    .populate({
-      path: "medecinId",
-    })
-    .populate({
-      path: "patientId",
-    });
+  .populate({
+    path: "patientId",
+  });
   if (!paiement)
     return res.status(404).send("le paiement avec cet id n'existe pas");
   res.send(paiement);
