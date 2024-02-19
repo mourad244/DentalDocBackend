@@ -18,7 +18,6 @@ const getPathData = require("../middleware/getPathData");
 const compressImage = require("../utils/compressImage");
 const uploadImages = require("../middleware/uploadImages");
 const deleteImages = require("../middleware/deleteImages");
-const deleteIndexedImages = require("../middleware/deleteIndexedImages");
 
 const router = express.Router();
 

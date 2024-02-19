@@ -16,7 +16,6 @@ const getPathData = require("../middleware/getPathData");
 const compressImage = require("../utils/compressImage");
 const uploadImages = require("../middleware/uploadImages");
 const deleteImages = require("../middleware/deleteImages");
-const deleteIndexedImages = require("../middleware/deleteIndexedImages");
 
 const router = express.Router();
 
@@ -49,7 +48,6 @@ router.post("/", [auth, admin], async (req, res) => {
 
   const { patientId, medecinId, dateDevi, montant, acteEffectues, rdvIds } =
     req.body;
-
   const { image: images } = getPathData(req.files);
   if (images) compressImage(images);
   const newImages = images
@@ -159,24 +157,21 @@ router.put("/:id", [auth, admin], async (req, res) => {
   } = req.body;
   const { image: images } = getPathData(req.files);
   if (images) compressImage(images);
+
+  const devi = await Devi.findById(req.params.id);
+  if (!devi) return res.status(400).send("Devi Invalide.");
   const newImages = images
     ? images.map((image) => image.destination + "/compressed/" + image.filename)
     : [];
   // Merge old and new images, excluding deleted ones
   const updatedImages =
     imagesDeletedIndex && imagesDeletedIndex.length !== 0
-      ? patient.images.filter((_, index) => !imagesDeletedIndex.includes(index))
-      : patient.images;
+      ? devi.images.filter((_, index) => !imagesDeletedIndex.includes(index))
+      : devi.images;
 
   updatedImages.push(...newImages);
-
   // validation to delete if sure they are called just before
-  const patient = await Patient.findById(patientId);
-  if (!patient) return res.status(400).send("Patient Invalide.");
-  if (medecinId) {
-    const medecin = await Medecin.findById(medecinId);
-    if (!medecin) return res.status(400).send("Medecin Invalide.");
-  }
+
   // validations
   let i = 0;
   let j = 0;
@@ -199,23 +194,15 @@ router.put("/:id", [auth, admin], async (req, res) => {
     i++;
   }
 
-  const devi = await Devi.findByIdAndUpdate(
-    req.params.id,
-    {
-      numOrdre,
-      patientId,
-      medecinId,
-      dateDevi,
-      acteEffectues,
-      montant,
-      images: updatedImages,
-    },
-    {
-      new: true,
-    }
-  );
-
-  if (!devi) return res.status(404).send("le devi avec cet id n'existe pas");
+  await Devi.findByIdAndUpdate(req.params.id, {
+    numOrdre,
+    patientId,
+    medecinId,
+    dateDevi,
+    acteEffectues,
+    montant,
+    images: updatedImages,
+  });
 
   const updatedPatient = await Patient.findOneAndUpdate(
     { _id: patientId },
