@@ -5,42 +5,18 @@ const admin = require("../middleware/admin");
 
 const router = express.Router();
 router.get("/", async (req, res) => {
+  const searchString = req.query.search;
+
+  if (!searchString) {
+    return res.status(400).send("Search string is required");
+  }
   const patients = await Patient.find({
     $or: [
-      { cin: { $regex: req.query.search, $options: "i" } },
-      { nom: { $regex: req.query.search, $options: "i" } },
-      { numDossier: { $regex: req.query.search, $options: "i" } },
+      { cin: { $regex: searchString, $options: "i" } },
+      { nom: { $regex: searchString, $options: "i" } },
+      { prenom: { $regex: searchString, $options: "i" } },
     ],
-  })
-    .populate("medecinId")
-    .populate({
-      path: "prochainRdv",
-      populate: {
-        path: "medecinId",
-      },
-    })
-    .populate({
-      path: "deviIds",
-      populate: {
-        path: "deviId",
-        populate: {
-          path: "acteEffectues",
-          populate: {
-            path: "acteId",
-            populate: {
-              path: "natureId",
-              select: "nom",
-            },
-          },
-        },
-      },
-    })
-    .populate({
-      path: "paiementIds",
-      populate: {
-        path: "paiementId",
-      },
-    });
+  }).select("nom prenom cin dateNaissance");
 
   res.send(patients);
 });

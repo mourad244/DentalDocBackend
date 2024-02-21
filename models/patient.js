@@ -148,6 +148,7 @@ patientSchema.methods.calculateTotalPaiements = function () {
 patientSchema.methods.calculateBalance = function () {
   this.balance = this.totalDevis - this.totalPaiements;
 };
+patientSchema.index({ nom: 1, prenom: 1, cin: 1 });
 
 const Patient = mongoose.model("Patient", patientSchema);
 exports.patientSchema = patientSchema;

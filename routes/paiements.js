@@ -124,8 +124,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-  const paiement = await Paiement.findById(req.params.id)
-  .populate({
+  const paiement = await Paiement.findById(req.params.id).populate({
     path: "patientId",
   });
   if (!paiement)
@@ -146,7 +145,6 @@ router.delete("/:id", [auth, admin], async (req, res) => {
       }
     );
     const updatedPatient = await Patient.findById(paiement.patientId);
-
     updatedPatient.calculateTotalPaiements();
     updatedPatient.calculateBalance();
     await updatedPatient.save();

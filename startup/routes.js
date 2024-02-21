@@ -24,7 +24,6 @@ const paiementsAccueil = require("../routes/paiementsAccueil");
 const detailCouvertures = require("../routes/detailCouvertures");
 const specialiteMedecins = require("../routes/specialiteMedecins");
 const categorieMedicaments = require("../routes/categorieMedicaments");
-
 const error = require("../middleware/error");
 const cors = require("cors");
 
