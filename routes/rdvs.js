@@ -2,7 +2,6 @@ const express = require("express");
 const { Rdv } = require("../models/rdv");
 
 const { Patient } = require("../models/patient");
-const { Medecin } = require("../models/medecin");
 
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
@@ -19,6 +18,10 @@ router.get("/", async (req, res) => {
     .populate({
       path: "deviId",
       select: "numOrdre",
+    })
+    .populate({
+      path: "acteId",
+      select: "nom",
     })
     .sort("datePrevu");
   res.send(rdvs);
