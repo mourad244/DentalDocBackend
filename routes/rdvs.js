@@ -29,11 +29,10 @@ router.get("/", async (req, res) => {
 
 router.post("/", [auth, admin], async (req, res) => {
   const { error } = validations.rdv(req.body);
-  // console.log(error);
   if (error) return res.status(400).send(error.details[0].message);
-
   const {
     patientId,
+    newPatient,
     datePrevu,
     description,
     isHonnore,
@@ -43,15 +42,49 @@ router.post("/", [auth, admin], async (req, res) => {
     natureId,
     acteId,
   } = req.body;
+  let patient = {};
+  if (patientId) {
+    patient = await Patient.findById(patientId);
+    if (!patient) return res.status(400).send("Patient Invalide.");
+  }
+  // compare newPatient with patient and update patient if newPatient is different
+  if (newPatient) {
+    if (patientId) {
+      patient.cin = newPatient.cin;
+      patient.nom = newPatient.nom;
+      patient.prenom = newPatient.prenom;
+      patient.isMasculin = newPatient.isMasculin;
+      patient.telephone = newPatient.telephone;
+      patient.regionId = newPatient.regionId ? newPatient.regionId : undefined;
+      patient.provinceId = newPatient.provinceId
+        ? newPatient.provinceId
+        : undefined;
+      patient.prochainRdv = {
+        date: datePrevu,
+      };
+    } else {
+      const { error } = validations.patient(newPatient);
+      if (error) return res.status(400).send(error.details[0].message);
+      patient = new Patient({
+        cin: newPatient.cin,
+        nom: newPatient.nom,
+        prenom: newPatient.prenom,
+        isMasculin: newPatient.isMasculin,
+        telephone: newPatient.telephone,
+        regionId: newPatient.regionId ? newPatient.regionId : patient.regionId,
+        provinceId: newPatient.provinceId
+          ? newPatient.provinceId
+          : patient.provinceId,
+        prochainRdv: {
+          date: datePrevu,
+        },
+      });
+    }
+  }
+  await patient.save();
 
-  // validation to delete if sure they are called just before
-
-  const patient = await Patient.findById(patientId);
-  if (!patient) return res.status(400).send("Patient Invalide.");
-  // const medecin = await Medecin.findById(medecinId);
-  // if (!medecin) return res.status(400).send("Medecin Invalide.");
   const rdv = new Rdv({
-    patientId,
+    patientId: patient._id,
     datePrevu,
     description,
     isHonnore: isHonnore === null ? undefined : isHonnore,
@@ -61,11 +94,8 @@ router.post("/", [auth, admin], async (req, res) => {
     natureId: !natureId ? undefined : natureId,
     acteId: !acteId ? undefined : acteId,
   });
-  patient.prochainRdv = {
-    date: datePrevu,
-  };
+
   await rdv.save();
-  await patient.save();
   res.send(rdv);
 });
 
@@ -74,6 +104,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
   const {
     patientId,
+    newPatient,
     datePrevu,
     description,
     isHonnore,
@@ -87,8 +118,34 @@ router.put("/:id", [auth, admin], async (req, res) => {
     acteId,
   } = req.body;
   // validation to delete if sure they are called just before
-  const patient = await Patient.findById(patientId);
+
+  let patient = await Patient.findById(patientId);
   if (!patient) return res.status(400).send("Patient Invalide.");
+
+  patient.cin = newPatient.cin;
+  patient.nom = newPatient.nom;
+  patient.prenom = newPatient.prenom;
+  patient.isMasculin = newPatient.isMasculin;
+  patient.telephone = newPatient.telephone;
+  patient.regionId = newPatient.regionId ? newPatient.regionId : undefined;
+  patient.provinceId = newPatient.provinceId
+    ? newPatient.provinceId
+    : undefined;
+  if (
+    (isAnnule || isReporte) &&
+    new Date(patient.prochainRdv.date).getFullYear() ===
+      new Date(rdv.datePrevu).getFullYear() &&
+    new Date(patient.prochainRdv.date).getMonth() ===
+      new Date(rdv.datePrevu).getMonth() &&
+    new Date(patient.prochainRdv.date).getDate() ===
+      new Date(rdv.datePrevu).getDate()
+  )
+    patient.prochainRdv = {
+      date: "",
+    };
+
+  await patient.save();
+
   const rdv = await Rdv.findByIdAndUpdate(
     req.params.id,
     {
@@ -109,20 +166,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
       new: true,
     }
   );
-  if (
-    (isAnnule || isReporte) &&
-    new Date(patient.prochainRdv.date).getFullYear() ===
-      new Date(rdv.datePrevu).getFullYear() &&
-    new Date(patient.prochainRdv.date).getMonth() ===
-      new Date(rdv.datePrevu).getMonth() &&
-    new Date(patient.prochainRdv.date).getDate() ===
-      new Date(rdv.datePrevu).getDate()
-  ) {
-    patient.prochainRdv = {
-      date: "",
-    };
-    await patient.save();
-  }
+
   if (lastRdvId) {
     const lastRdv = await Rdv.findById(lastRdvId);
     if (
@@ -145,7 +189,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
 router.get("/:id", async (req, res) => {
   const rdv = await Rdv.findById(req.params.id).populate({
     path: "patientId",
-    select: "nom prenom telephone",
+    select: "nom prenom telephone cin isMasculin regionId provinceId",
   });
   if (!rdv) return res.status(404).send("le rdv avec cet id n'existe pas");
   res.send(rdv);
