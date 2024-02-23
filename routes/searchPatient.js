@@ -6,7 +6,6 @@ const admin = require("../middleware/admin");
 const router = express.Router();
 router.get("/", async (req, res) => {
   const searchString = req.query.search;
-
   if (!searchString) {
     return res.status(400).send("Search string is required");
   }
