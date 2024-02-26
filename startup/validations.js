@@ -64,7 +64,6 @@ module.exports = {
     const schema = Joi.object({
       nom: Joi.string().required(),
       prenom: Joi.string().required(),
-
       cin: Joi.string().allow("").allow(null),
       isMasculin: Joi.boolean().allow("").allow(null),
       dateRecu: Joi.date().allow(""),
@@ -98,8 +97,9 @@ module.exports = {
   },
   devi: (devi) => {
     const schema = Joi.object({
+      patientId: Joi.objectId().allow("").allow(null),
+      newPatient: Joi.object(),
       numOrdre: Joi.number().allow(null).allow(""),
-      patientId: Joi.objectId().required(),
       medecinId: Joi.objectId().required(),
       dateDevi: Joi.date(),
       images: Joi.array(),
@@ -124,11 +124,10 @@ module.exports = {
   rdv: (rdv) => {
     const schema = Joi.object({
       patientId: Joi.objectId().allow("").allow(null),
-      // medecinId: Joi.objectId().required(),
+      newPatient: Joi.object(),
       datePrevu: Joi.date().required(),
       description: Joi.string().allow(""),
       isHonnore: Joi.boolean().allow(null),
-      newPatient: Joi.object(),
       isAnnule: Joi.boolean().allow(null),
       isReporte: Joi.boolean().allow(null),
       dateNouveauRdv: Joi.date().allow(null).allow(""),

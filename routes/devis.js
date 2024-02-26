@@ -46,8 +46,15 @@ router.post("/", [auth, admin], async (req, res) => {
     return res.status(400).send(error.details[0].message);
   }
 
-  const { patientId, medecinId, dateDevi, montant, acteEffectues, rdvIds } =
-    req.body;
+  const {
+    patientId,
+    newPatient,
+    medecinId,
+    dateDevi,
+    montant,
+    acteEffectues,
+    rdvIds,
+  } = req.body;
   const { image: images } = getPathData(req.files);
   if (images) compressImage(images);
   const newImages = images
@@ -64,8 +71,40 @@ router.post("/", [auth, admin], async (req, res) => {
   counter.lastNumOrdre += 1;
   const numOrdre = counter.lastNumOrdre;
 
-  const patient = await Patient.findById(patientId);
-  if (!patient) return res.status(400).send("Patient Invalide.");
+  let patient = {};
+  if (patientId) {
+    patient = await Patient.findById(patientId);
+    if (!patient) return res.status(400).send("Patient Invalide.");
+  }
+
+  if (newPatient) {
+    if (patientId) {
+      patient.cin = newPatient.cin;
+      patient.nom = newPatient.nom;
+      patient.prenom = newPatient.prenom;
+      patient.isMasculin = newPatient.isMasculin;
+      patient.telephone = newPatient.telephone;
+      patient.regionId = newPatient.regionId ? newPatient.regionId : undefined;
+      patient.provinceId = newPatient.provinceId
+        ? newPatient.provinceId
+        : undefined;
+    } else {
+      const { error } = validations.patient(newPatient);
+      if (error) return res.status(400).send(error.details[0].message);
+      patient = new Patient({
+        cin: newPatient.cin,
+        nom: newPatient.nom,
+        prenom: newPatient.prenom,
+        isMasculin: newPatient.isMasculin,
+        telephone: newPatient.telephone,
+        regionId: newPatient.regionId ? newPatient.regionId : patient.regionId,
+        provinceId: newPatient.provinceId
+          ? newPatient.provinceId
+          : patient.provinceId,
+      });
+    }
+  }
+
   if (medecinId) {
     const medecin = await Medecin.findById(medecinId);
     if (!medecin) return res.status(400).send("Medecin Invalide.");
@@ -95,7 +134,7 @@ router.post("/", [auth, admin], async (req, res) => {
   }
   const devi = new Devi({
     numOrdre: numOrdre,
-    patientId: patientId,
+    patientId: patient._id,
     medecinId: medecinId,
     dateDevi: dateDevi,
     acteEffectues: acteEffectues,
@@ -121,7 +160,6 @@ router.post("/", [auth, admin], async (req, res) => {
       i++;
     }
   }
-
   patient.calculateTotalDevis();
   patient.calculateBalance();
 
@@ -149,6 +187,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
   const {
     numOrdre,
     patientId,
+    newPatient,
     medecinId,
     dateDevi,
     montant,
@@ -207,10 +246,23 @@ router.put("/:id", [auth, admin], async (req, res) => {
   const updatedPatient = await Patient.findOneAndUpdate(
     { _id: patientId },
     { $set: { "deviIds.$[elem].montant": montant } },
+
     { arrayFilters: [{ "elem.deviId": devi._id }], new: true }
   );
   if (!updatedPatient)
     return res.status(404).send("Failed to update patient with devi montant.");
+  // i want to update only the cin nom prenom isMasculin telephone regionId provinceId of patient if newPatient is different from patientId
+  updatedPatient.cin = newPatient.cin;
+  updatedPatient.nom = newPatient.nom;
+  updatedPatient.prenom = newPatient.prenom;
+  updatedPatient.isMasculin = newPatient.isMasculin;
+  updatedPatient.telephone = newPatient.telephone;
+  updatedPatient.regionId = newPatient.regionId
+    ? newPatient.regionId
+    : updatedPatient.regionId;
+  updatedPatient.provinceId = newPatient.provinceId
+    ? newPatient.provinceId
+    : updatedPatient.provinceId;
 
   updatedPatient.calculateTotalDevis();
   updatedPatient.calculateBalance();

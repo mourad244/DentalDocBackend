@@ -10,7 +10,23 @@ const validations = require("../startup/validations");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const rdvs = await Rdv.find()
+  let query = {};
+  const date = req.query.date;
+  if (date) {
+    // If a date is provided, construct the start and end of the day in UTC
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0); // Set to start of the day
+
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999); // Set to end of the day
+
+    // Update the query to look for rdvs within the specified day
+    query.datePrevu = {
+      $gte: startOfDay,
+      $lte: endOfDay,
+    };
+  }
+  const rdvs = await Rdv.find(query)
     .populate({
       path: "patientId",
       select: "nom prenom telephone",
