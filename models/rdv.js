@@ -61,6 +61,9 @@ const rdvSchema = new mongoose.Schema({
     },
   },
 });
+
+rdvSchema.index({ datePrevu: 1 });
+
 const Rdv = mongoose.model("Rdv", rdvSchema);
 
 exports.rdvSchema = rdvSchema;
