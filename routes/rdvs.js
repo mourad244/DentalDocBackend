@@ -135,6 +135,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
   } = req.body;
   // validation to delete if sure they are called just before
   let patient = await Patient.findById(patientId);
+
   if (!patient) return res.status(400).send("Patient Invalide.");
   if (newPatient) {
     patient.cin = newPatient.cin;
@@ -147,20 +148,6 @@ router.put("/:id", [auth, admin], async (req, res) => {
       ? newPatient.provinceId
       : undefined;
   }
-  if (
-    (isAnnule || isReporte) &&
-    new Date(patient.prochainRdv.date).getFullYear() ===
-      new Date(rdv.datePrevu).getFullYear() &&
-    new Date(patient.prochainRdv.date).getMonth() ===
-      new Date(rdv.datePrevu).getMonth() &&
-    new Date(patient.prochainRdv.date).getDate() ===
-      new Date(rdv.datePrevu).getDate()
-  )
-    patient.prochainRdv = {
-      date: "",
-    };
-
-  await patient.save();
 
   const rdv = await Rdv.findByIdAndUpdate(
     req.params.id,
@@ -182,7 +169,20 @@ router.put("/:id", [auth, admin], async (req, res) => {
       new: true,
     }
   );
+  if (
+    (isAnnule || isReporte) &&
+    new Date(patient.prochainRdv.date).getFullYear() ===
+      new Date(rdv.datePrevu).getFullYear() &&
+    new Date(patient.prochainRdv.date).getMonth() ===
+      new Date(rdv.datePrevu).getMonth() &&
+    new Date(patient.prochainRdv.date).getDate() ===
+      new Date(rdv.datePrevu).getDate()
+  )
+    patient.prochainRdv = {
+      date: "",
+    };
 
+  await patient.save();
   if (lastRdvId) {
     const lastRdv = await Rdv.findById(lastRdvId);
     if (
