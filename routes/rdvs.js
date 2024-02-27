@@ -134,19 +134,19 @@ router.put("/:id", [auth, admin], async (req, res) => {
     acteId,
   } = req.body;
   // validation to delete if sure they are called just before
-
   let patient = await Patient.findById(patientId);
   if (!patient) return res.status(400).send("Patient Invalide.");
-
-  patient.cin = newPatient.cin;
-  patient.nom = newPatient.nom;
-  patient.prenom = newPatient.prenom;
-  patient.isMasculin = newPatient.isMasculin;
-  patient.telephone = newPatient.telephone;
-  patient.regionId = newPatient.regionId ? newPatient.regionId : undefined;
-  patient.provinceId = newPatient.provinceId
-    ? newPatient.provinceId
-    : undefined;
+  if (newPatient) {
+    patient.cin = newPatient.cin;
+    patient.nom = newPatient.nom;
+    patient.prenom = newPatient.prenom;
+    patient.isMasculin = newPatient.isMasculin;
+    patient.telephone = newPatient.telephone;
+    patient.regionId = newPatient.regionId ? newPatient.regionId : undefined;
+    patient.provinceId = newPatient.provinceId
+      ? newPatient.provinceId
+      : undefined;
+  }
   if (
     (isAnnule || isReporte) &&
     new Date(patient.prochainRdv.date).getFullYear() ===
