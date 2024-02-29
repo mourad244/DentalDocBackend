@@ -13,24 +13,14 @@ router.get("/", async (req, res) => {
   let query = {};
   const date = req.query.date;
   if (date) {
+    // Assume a UTC+1 time zone for this example
+    const timeZoneOffsetInHours = 1;
     // If a date is provided, construct the start and end of the day in UTC
-    console.log("to UTC string", new Date(date).toUTCString());
-    console.log("date", new Date(date));
-    const startOfDay = new Date(
-      new Date(date).getDate() + 1,
-      new Date(date).getMonth(),
-      new Date(date).getFullYear()
-    );
-    startOfDay.setHours(0, 0, 0, 0); // Set to start of the day
+    const startOfDay = new Date(date);
+    startOfDay.setUTCHours(-timeZoneOffsetInHours, 0, 0, 0); // Adjust for time zone offset
 
-    const endOfDay = new Date(
-      new Date(
-        new Date(date).getDate() + 1,
-        new Date(date).getMonth(),
-        new Date(date).getFullYear()
-      )
-    );
-    endOfDay.setHours(23, 59, 59, 999); // Set to end of the day
+    const endOfDay = new Date(date);
+    endOfDay.setUTCHours(23 - timeZoneOffsetInHours, 59, 59, 999); // Adjust for time zone and set to end of the day
 
     // Update the query to look for rdvs within the specified day
     query.datePrevu = {
