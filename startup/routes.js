@@ -24,6 +24,7 @@ const paiementsAccueil = require("../routes/paiementsAccueil");
 const detailCouvertures = require("../routes/detailCouvertures");
 const specialiteMedecins = require("../routes/specialiteMedecins");
 const categorieMedicaments = require("../routes/categorieMedicaments");
+const patientsListPaginate = require("../routes/patientsListPaginate");
 const error = require("../middleware/error");
 const cors = require("cors");
 
@@ -57,6 +58,6 @@ module.exports = function (app) {
   app.use("/dentaldoc/detailcouvertures", detailCouvertures);
   app.use("/dentaldoc/specialitemedecins", specialiteMedecins);
   app.use("/dentaldoc/categoriemedicaments", categorieMedicaments);
-
+  app.use("/dentaldoc/patientslistpaginate", patientsListPaginate);
   app.use(error);
 };
