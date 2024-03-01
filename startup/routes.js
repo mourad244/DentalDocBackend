@@ -25,6 +25,7 @@ const detailCouvertures = require("../routes/detailCouvertures");
 const specialiteMedecins = require("../routes/specialiteMedecins");
 const categorieMedicaments = require("../routes/categorieMedicaments");
 const patientsListPaginate = require("../routes/patientsListPaginate");
+const devisPaginate = require("../routes/devisPaginate");
 const error = require("../middleware/error");
 const cors = require("cors");
 
@@ -54,6 +55,7 @@ module.exports = function (app) {
   app.use("/dentaldoc/medicaments", medicaments);
   app.use("/dentaldoc/couvertures", couvertures);
   app.use("/dentaldoc/natureactes", natureActes);
+  app.use("/dentaldoc/devispaginate", devisPaginate);
   app.use("/dentaldoc/actedentaires", acteDentaires);
   app.use("/dentaldoc/detailcouvertures", detailCouvertures);
   app.use("/dentaldoc/specialitemedecins", specialiteMedecins);
