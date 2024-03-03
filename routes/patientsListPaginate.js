@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   const page = parseInt(req.query.currentPage) || 1;
-  const pageSize = parseInt(req.query.pageSize) || 5;
+  const pageSize = parseInt(req.query.pageSize) || 15;
   const sortColumn = req.query.sortColumn || "nom";
   const order = req.query.order || "asc";
   const searchQuery = req.query.searchQuery || "";

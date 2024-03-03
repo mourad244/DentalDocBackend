@@ -1,6 +1,6 @@
 const express = require("express");
 
-const { Devi } = require("../models/devi");
+const { Paiement } = require("../models/paiement");
 
 const router = express.Router();
 
@@ -24,7 +24,7 @@ router.get("/", async (req, res) => {
     end = new Date(date.getFullYear(), 11, 31, 23, 59, 59, 999);
   }
   const query = {
-    dateDevi: {
+    date: {
       $gte: start,
       $lte: end,
     },
@@ -32,24 +32,20 @@ router.get("/", async (req, res) => {
   const skipIndex = (page - 1) * pageSize;
 
   try {
-    const totalCount = await Devi.countDocuments(query);
-    const devis = await Devi.find(query)
-      .populate({
-        path: "medecinId",
-      })
+    const totalCount = await Paiement.countDocuments(query);
+    const paiements = await Paiement.find(query)
+
       .populate({
         path: "patientId",
       })
-      .populate("rdvIds")
+
       .sort({ [sortColumn]: order === "asc" ? 1 : -1 })
       .skip(skipIndex)
       .limit(pageSize);
-    /* .select(
-        "dateNaissance isMasculin profession cin prochainRdv nom numOrdre prenom telephone regionId provinceId"
-      ); */
-    res.send({ data: devis, totalCount });
+
+    res.send({ data: paiements, totalCount });
   } catch (error) {
-    res.status(500).send("Error fetching devis data");
+    res.status(500).send("Error fetching paiements data");
   }
 });
 module.exports = router;
