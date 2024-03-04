@@ -300,7 +300,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const devi = await Devi.findOneAndDelete(req.params.id);
+  const devi = await Devi.findOneAndDelete({ _id: req.params.id });
   if (!devi) return res.status(404).send("le devi avec cet id n'existe pas");
   if (devi.images) deleteImages(devi.images);
   try {

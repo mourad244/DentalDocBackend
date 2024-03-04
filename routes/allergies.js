@@ -48,7 +48,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const allergie = await Allergie.findOneAndDelete(req.params.id);
+  const allergie = await Allergie.findOneAndDelete({ _id: req.params.id });
   if (!allergie)
     return res.status(404).send("allergie avec cet id n'existe pas");
 

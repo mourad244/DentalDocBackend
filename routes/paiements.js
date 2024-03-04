@@ -133,7 +133,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const paiement = await Paiement.findOneAndDelete(req.params.id);
+  const paiement = await Paiement.findOneAndDelete({ _id: req.params.id });
   if (!paiement)
     return res.status(404).send("le paiement avec cet id n'existe pas");
 

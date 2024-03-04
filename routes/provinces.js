@@ -54,7 +54,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const province = await Province.findOneAndDelete(req.params.id);
+  const province = await Province.findOneAndDelete({ _id: req.params.id });
   if (!province)
     return res.status(404).send("la province avec cet id n'existe pas");
   res.send(province);

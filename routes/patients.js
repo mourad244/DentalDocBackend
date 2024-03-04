@@ -265,9 +265,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  console.log("req.params.id", req.params.id);
   const patient = await Patient.findOneAndDelete({ _id: req.params.id });
-  console.log("patient", patient);
   if (!patient)
     return res.status(404).send("le patient avec cet id n'existe pas");
   if (patient.images) deleteImages(patient.images);

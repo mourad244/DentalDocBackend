@@ -60,7 +60,7 @@ router.get("/:id", async (req, res) => {
   res.send(user);
 });
 router.delete("/:id", async (req, res) => {
-  const user = await User.findOneAndDelete(req.params.id);
+  const user = await User.findOneAndDelete({ _id: req.params.id });
   if (!user) return res.status(404).send("user avec cet id n'existe pas");
   res.send(user);
 });

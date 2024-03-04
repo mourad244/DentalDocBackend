@@ -49,7 +49,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const region = await Region.findOneAndDelete(req.params.id);
+  const region = await Region.findOneAndDelete({ _id: req.params.id });
   if (!region) return res.status(404).send("l'region avec cet id n'existe pas");
   res.send(region);
 });

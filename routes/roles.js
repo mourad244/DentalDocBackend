@@ -44,7 +44,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const role = await Role.findOneAndDelete(req.params.id);
+  const role = await Role.findOneAndDelete({ _id: req.params.id });
   if (!role) return res.status(404).send("role avec cet id n'existe pas");
   res.send(role);
 });
