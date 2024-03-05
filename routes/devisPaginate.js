@@ -10,12 +10,19 @@ router.get("/", async (req, res) => {
   const sortColumn = req.query.sortColumn || "nom";
   const order = req.query.order || "asc";
   const time = req.query.time || "journee";
-  let date = req.query.date ? new Date(req.query.date) : new Date();
+  const date = new Date(req.query.date);
 
   let start, end;
+
   if (time === "journee") {
-    start = new Date(date.setHours(0, 0, 0, 0));
-    end = new Date(date.setHours(23, 59, 59, 999));
+    const timeZoneOffsetInHours = 1;
+    start = new Date(date);
+    start.setUTCHours(-timeZoneOffsetInHours, 0, 0, 0); // Adjust for time zone offset
+    end = new Date(date);
+    end.setUTCHours(23 - timeZoneOffsetInHours, 59, 59, 999); // Adjust for time zone and set to end of the day
+
+    // start = new Date(date.setHours(0, 0, 0, 0));
+    // end = new Date(date.setHours(23, 59, 59, 999));
   } else if (time === "mois") {
     start = new Date(date.getFullYear(), date.getMonth(), 1);
     end = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
