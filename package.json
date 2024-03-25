@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mourad244/dentaireBackend.git"
+    "url": "git+https://github.com/mourad244/DentalDocBackend.git"
   },
   "dependencies": {
     "bcrypt": "^5.0.0",
@@ -40,8 +40,8 @@
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/mourad244/svc-dentaire/issues"
+    "url": "https://github.com/mourad244/DentalDocBackend/issues"
   },
-  "homepage": "https://github.com/mourad244/svc-dentaire#readme",
+  "homepage": "https://github.com/mourad244/DentalDocBackend#readme",
   "description": ""
 }

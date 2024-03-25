@@ -1,5 +1,5 @@
 const express = require("express");
-const { ActeDentaire, acteDentaireSchema } = require("../models/acteDentaire");
+const { ActeDentaire } = require("../models/acteDentaire");
 
 const { NatureActe } = require("../models/natureActe");
 
@@ -79,7 +79,9 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const acteDentaire = await ActeDentaire.findOneAndDelete({ _id: req.params.id });
+  const acteDentaire = await ActeDentaire.findOneAndDelete({
+    _id: req.params.id,
+  });
   if (!acteDentaire)
     return res.status(404).send("le acteDentaire avec cet id n'existe pas");
   res.send(acteDentaire);

@@ -60,6 +60,28 @@ module.exports = {
     });
     return schema.validate(role);
   },
+  lot: (lot) => {
+    const schema = Joi.object({
+      nom: Joi.string().required(),
+    });
+    return schema.validate(lot);
+  },
+  article: (article) => {
+    const schema = Joi.object({
+      lotId: Joi.objectId().allow(""),
+      code: Joi.string().required(),
+      nom: Joi.string().required(),
+      stockInitial: Joi.number().allow(""),
+      stockAlerte: Joi.number().allow(""),
+      unite: Joi.string().allow(""),
+      uniteReglementaire: Joi.string().allow(""),
+      prixHT: Joi.number().allow(""),
+      tauxTVA: Joi.number().allow(""),
+      prixTTC: Joi.number().allow(""),
+      isExpiration: Joi.boolean().allow(""),
+    });
+    return schema.validate(article);
+  },
   patient: (patient) => {
     const schema = Joi.object({
       nom: Joi.string().required(),
@@ -120,6 +142,19 @@ module.exports = {
       montant: Joi.number().required(),
     });
     return schema.validate(paiement);
+  },
+  fournisseur: (fournisseur) => {
+    const schema = Joi.object({
+      nom: Joi.string().required(),
+      adresse: Joi.string().allow(""),
+      telephone: Joi.string().allow(""),
+      fax: Joi.string().allow(""),
+      email: Joi.string().allow(""),
+      contact: Joi.string().allow(""),
+      siteWeb: Joi.string().allow(""),
+      articleIds: Joi.array(),
+    });
+    return schema.validate(fournisseur);
   },
   rdv: (rdv) => {
     const schema = Joi.object({
