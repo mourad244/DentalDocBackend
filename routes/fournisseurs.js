@@ -1,7 +1,6 @@
 const express = require("express");
 
 const { Fournisseur } = require("../models/fournisseur");
-const { Article } = require("../models/article");
 
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");

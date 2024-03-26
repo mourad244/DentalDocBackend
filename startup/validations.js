@@ -143,18 +143,28 @@ module.exports = {
     });
     return schema.validate(paiement);
   },
-  fournisseur: (fournisseur) => {
+  societe: (societe) => {
     const schema = Joi.object({
       nom: Joi.string().required(),
-      adresse: Joi.string().allow(""),
       telephone: Joi.string().allow(""),
-      fax: Joi.string().allow(""),
+      adresse: Joi.string().allow(""),
+      ville: Joi.string().allow(""),
+      banque: Joi.string().allow(""),
+      lieuOuvertureBanque: Joi.string().allow(""),
+      RIB: Joi.string().allow(""),
+      numPatente: Joi.string().allow(""),
+      numRC: Joi.string().allow(""),
+      numIF: Joi.string().allow(""),
+      numCNSS: Joi.string().allow(""),
+      numICE: Joi.string().allow(""),
       email: Joi.string().allow(""),
-      contact: Joi.string().allow(""),
-      siteWeb: Joi.string().allow(""),
+      fax: Joi.string().allow(""),
+      taxPro: Joi.string().allow(""),
+      site: Joi.string().allow(""),
+      description: Joi.string().allow(""),
       articleIds: Joi.array(),
     });
-    return schema.validate(fournisseur);
+    return schema.validate(societe);
   },
   rdv: (rdv) => {
     const schema = Joi.object({
