@@ -186,6 +186,23 @@ module.exports = {
     });
     return schema.validate(rdv);
   },
+  bonCommande: (bonCommande) => {
+    const schema = Joi.object({
+      numOrdre: Joi.string().allow(""),
+      date: Joi.date().allow(""),
+      objet: Joi.string().allow(""),
+      societeRetenuId: Joi.objectId().allow(""),
+      montantHT: Joi.number().allow(""),
+      tva: Joi.number().allow(""),
+      montantTTC: Joi.number().allow(""),
+      commentaire: Joi.string().allow(""),
+      articles: Joi.array(),
+      paiementIds: Joi.array(),
+      isPayed: Joi.boolean().allow(""),
+      images: Joi.array(),
+    });
+    return schema.validate(bonCommande);
+  },
   province: (province) => {
     const schema = Joi.object({
       nom: Joi.string().required(),

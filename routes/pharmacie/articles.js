@@ -1,12 +1,12 @@
 const express = require("express");
 
-const { Article } = require("../models/article");
-const { Lot } = require("../models/lot");
+const { Article } = require("../../models/pharmacie/article");
+const { Lot } = require("../../models/pharmacie/lot");
 
-const auth = require("../middleware/auth");
-const admin = require("../middleware/admin");
+const auth = require("../../middleware/auth");
+const admin = require("../../middleware/admin");
 
-const validations = require("../startup/validations");
+const validations = require("../../startup/validations");
 const router = express.Router();
 
 router.get("/", async (req, res) => {

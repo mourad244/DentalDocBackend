@@ -1,17 +1,20 @@
 const express = require("express");
-const { BonCommande } = require("../models/bonCommande");
-const { Societe } = require("../models/societe");
-const validations = require("../startup/validations");
+const { BonCommande } = require("../../models/pharmacie/bonCommande");
+const { Societe } = require("../../models/pharmacie/societe");
+const {
+  CounterBonCommande,
+} = require("../../models/pharmacie/counterBonCommande");
+const validations = require("../../startup/validations");
 
-const auth = require("../middleware/auth");
-const admin = require("../middleware/admin");
+const auth = require("../../middleware/auth");
+const admin = require("../../middleware/admin");
 
-const getPathData = require("../middleware/getPathData");
-const compressImage = require("../utils/compressImage");
-const deleteImages = require("../middleware/deleteImages");
-const uploadImages = require("../middleware/uploadImages");
+const getPathData = require("../../middleware/getPathData");
+const compressImage = require("../../utils/compressImage");
+const deleteImages = require("../../middleware/deleteImages");
+const uploadImages = require("../../middleware/uploadImages");
 const _ = require("lodash");
-const deleteIndexedImages = require("../middleware/deleteIndexedImages");
+const deleteIndexedImages = require("../../middleware/deleteIndexedImages");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -30,14 +33,12 @@ router.post("/", [auth, admin], async (req, res) => {
     });
   }
   const { error } = validations.bonCommande(req.body);
-
   if (error) {
     deleteImages(req.files);
     return res.status(400).send(error.details[0].message);
   }
   //search string in table
   let {
-    numOrdre,
     date,
     objet,
     societeRetenuId,
@@ -49,13 +50,20 @@ router.post("/", [auth, admin], async (req, res) => {
   } = req.body;
   const { image: images } = getPathData(req.files);
   if (images) compressImage(images);
+  const newImages = images
+    ? images.map((image) => image.destination + "/compressed/" + image.filename)
+    : [];
+  const currentYear = new Date(date).getFullYear();
 
-  if (numOrdre === "" || numOrdre === undefined) {
-    const lastBonCommande = await BonCommande.findOne().sort({
-      numOrdre: -1,
+  let counter = await CounterBonCommande.findOne({ year: currentYear });
+  if (!counter) {
+    counter = new CounterBonCommande({
+      lastNumOrdre: 0,
+      year: currentYear,
     });
-    numOrdre = lastBonCommande ? lastBonCommande.numOrdre + 1 : 1;
   }
+  counter.lastNumOrdre++;
+  const numOrdre = counter.lastNumOrdre;
 
   const bonCommande = new BonCommande({
     numOrdre,
@@ -100,39 +108,19 @@ router.put("/:id", [auth, admin], async (req, res) => {
     numOrdre,
     date,
     objet,
-    beneficiaires,
-    besoinIds,
-    concurrents,
     societeRetenuId,
-    lettreCirculaireId,
     montantHT,
+    tva,
     montantTTC,
-    destinataires,
-    // auProfit,
-    // naturePrestationId,
     commentaire,
     articles,
-    tva,
     imagesDeletedIndex,
   } = req.body;
   const { image: images } = getPathData(req.files);
   if (numOrdre) bonCommande.numOrdre = numOrdre;
   if (date) bonCommande.date = date;
   if (objet) bonCommande.objet = objet;
-  if (beneficiaires) bonCommande.beneficiaires = beneficiaires;
-  if (!beneficiaires.length === 0) {
-    beneficiaires.map(async (division) => {
-      //add all beneficiaires to the array
-      if (!division._id) {
-        let newDivision = {};
-        newDivision = new Division({
-          nom: division.nom,
-          acronyme: division.acronyme,
-        });
-        await newDivision.save();
-      }
-    });
-  }
+
   if (imagesDeletedIndex && imagesDeletedIndex.length !== 0) {
     await deleteIndexedImages(bonCommande.images, imagesDeletedIndex);
     // delete it from database
@@ -140,25 +128,6 @@ router.put("/:id", [auth, admin], async (req, res) => {
       (image, index) => !imagesDeletedIndex.includes(index)
     );
   }
-  if (besoinIds) bonCommande.besoinIds = besoinIds;
-
-  if (concurrents) bonCommande.concurrents = concurrents;
-  if (concurrents && concurrents.length !== 0) {
-    concurrents.map(async (societe) => {
-      //add all concurrents to the array
-      if (!societe._id) {
-        let newSociete = {};
-        newSociete = new Societe({
-          nom: societe.nom,
-          telephone: societe.telephone,
-          adresse: societe.adresse,
-          ville: societe.ville,
-        });
-        await newSociete.save();
-      }
-    });
-  }
-
   if (societeRetenuId) bonCommande.societeRetenuId = societeRetenuId;
   if (montantHT) bonCommande.montantHT = montantHT;
   if (montantTTC) bonCommande.montantTTC = montantTTC;

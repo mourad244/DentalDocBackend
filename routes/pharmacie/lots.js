@@ -1,9 +1,9 @@
 const express = require("express");
-const { Lot } = require("../models/lot");
-const auth = require("../middleware/auth");
-const admin = require("../middleware/admin");
+const { Lot } = require("../../models/pharmacie/lot");
+const auth = require("../../middleware/auth");
+const admin = require("../../middleware/admin");
 
-const validations = require("../startup/validations");
+const validations = require("../../startup/validations");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
