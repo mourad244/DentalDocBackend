@@ -198,11 +198,13 @@ router.put("/:id", [auth, admin], async (req, res) => {
   if (images) compressImage(images);
 
   const devi = await Devi.findById(req.params.id);
-  if (!devi) return res.status(400).send("Devi Invalide.");
+  if (!devi) {
+    deleteImages(req.files);
+    return res.status(400).send("Devi Invalide.");
+  }
   const newImages = images
     ? images.map((image) => image.destination + "/compressed/" + image.filename)
     : [];
-  // Merge old and new images, excluding deleted ones
   const updatedImages =
     imagesDeletedIndex && imagesDeletedIndex.length !== 0
       ? devi.images.filter((_, index) => !imagesDeletedIndex.includes(index))

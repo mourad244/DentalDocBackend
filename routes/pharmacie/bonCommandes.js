@@ -75,11 +75,7 @@ router.post("/", [auth, admin], async (req, res) => {
     commentaire,
     articles,
     tva,
-    images: images
-      ? images.map(
-          (image) => image.destination + "/compressed/" + image.filename
-        )
-      : [],
+    images: newImages,
   });
 
   await bonCommande.save();
@@ -99,12 +95,8 @@ router.put("/:id", [auth, admin], async (req, res) => {
     deleteImages(req.files);
     return res.status(400).send(error.details[0].message);
   }
-  const bonCommande = await BonCommande.findOne({ _id: req.params.id });
-  if (!bonCommande) {
-    deleteImages(req.files);
-    return res.status(404).send("le bonCommande avec cette id n'existe pas.");
-  }
-  let {
+
+  const {
     numOrdre,
     date,
     objet,
@@ -117,37 +109,35 @@ router.put("/:id", [auth, admin], async (req, res) => {
     imagesDeletedIndex,
   } = req.body;
   const { image: images } = getPathData(req.files);
-  if (numOrdre) bonCommande.numOrdre = numOrdre;
-  if (date) bonCommande.date = date;
-  if (objet) bonCommande.objet = objet;
-
-  if (imagesDeletedIndex && imagesDeletedIndex.length !== 0) {
-    await deleteIndexedImages(bonCommande.images, imagesDeletedIndex);
-    // delete it from database
-    bonCommande.images = bonCommande.images.filter(
-      (image, index) => !imagesDeletedIndex.includes(index)
-    );
+  if (images) compressImage(images);
+  const bonCommande = await BonCommande.findOne({ _id: req.params.id });
+  if (!bonCommande) {
+    deleteImages(req.files);
+    return res.status(404).send("le bonCommande avec cette id n'existe pas.");
   }
-  if (societeRetenuId) bonCommande.societeRetenuId = societeRetenuId;
-  if (montantHT) bonCommande.montantHT = montantHT;
-  if (montantTTC) bonCommande.montantTTC = montantTTC;
-  if (lettreCirculaireId) bonCommande.lettreCirculaireId = lettreCirculaireId;
-  // // // if (auProfit) bonCommande.auProfit = auProfit;
-  // // // if (naturePrestationId) bonCommande.naturePrestationId = naturePrestationId;
-  if (commentaire) bonCommande.commentaire = commentaire;
-  if (destinataires) bonCommande.destinataires = destinataires;
-  if (articles) bonCommande.articles = articles;
-  if (tva) bonCommande.tva = tva;
+  const newImages = images
+    ? images.map((image) => image.destination + "/compressed/" + image.filename)
+    : [];
+  const updatedImages =
+    imagesDeletedIndex && imagesDeletedIndex.length !== 0
+      ? bonCommande.images.filter(
+          (_, index) => !imagesDeletedIndex.includes(index)
+        )
+      : bonCommande.images;
+  updatedImages.push(...newImages);
 
-  if (images) {
-    compressImage(images);
-    bonCommande.images.push(
-      ...images.map(
-        (image) => image.destination + "/compressed/" + image.filename
-      )
-    );
-  }
-  await bonCommande.save();
+  await BonCommande.findByIdAndUpdate(req.params.id, {
+    numOrdre,
+    date,
+    objet,
+    societeRetenuId,
+    montantHT,
+    montantTTC,
+    commentaire,
+    articles,
+    tva,
+    images: updatedImages,
+  });
   res.send(bonCommande);
 });
 
