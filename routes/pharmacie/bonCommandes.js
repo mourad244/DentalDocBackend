@@ -142,35 +142,22 @@ router.put("/:id", [auth, admin], async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-  const bonCommande = await BonCommande.findById(req.params.id)
-    // .populate("naturePrestationIds")
-    .populate("besoinIds")
-    .populate("societeRetenuId");
+  const bonCommande = await BonCommande.findById(req.params.id).populate(
+    "societeRetenuId"
+  );
   if (!bonCommande)
     return res.status(404).send("le bonCommande avec cet id n'existe pas");
   res.send(bonCommande);
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const bonCommande = await BonCommande.findByIdAndRemove(req.params.id);
+  const bonCommande = await BonCommande.findOneAndDelete({
+    _id: req.params.id,
+  });
   if (!bonCommande)
     return res.status(404).send("le bonCommande avec cet id n'existe pas");
   if (bonCommande.images) deleteImages(bonCommande.images);
-  if (bonCommande.besoinIds && bonCommande.besoinIds.length !== 0) {
-    bonCommande.besoinIds.map(async (besoinId) => {
-      const besoin = await Besoin.findById(besoinId);
-      if (besoin) {
-        const found = besoin.bonCommandes.find(
-          // Language: javascript
-          (lc) => lc._id.toString() === bonCommande._id.toString()
-        );
-        if (found) {
-          besoin.bonCommandes.splice(besoin.bonCommandes.indexOf(found), 1);
-          await besoin.save();
-        }
-      }
-    });
-  }
+
   res.send(bonCommande);
 });
 

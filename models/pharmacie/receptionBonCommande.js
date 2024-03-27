@@ -1,13 +1,3 @@
-/* 
-bonCommandeId
-date
-montant
-articles
-commentaire
-images
-
-*/
-
 const mongoose = require("mongoose");
 
 const receptionBonCommandeSchema = new mongoose.Schema({

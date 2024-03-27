@@ -1,14 +1,3 @@
-/* 
-bonCommandeId
-montant
-date
-modePaiement
-numCheque
-banque
-commentaire
-
-*/
-
 const mongoose = require("mongoose");
 
 const paiementBonCommandeSchema = new mongoose.Schema({

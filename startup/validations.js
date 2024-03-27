@@ -203,6 +203,19 @@ module.exports = {
     });
     return schema.validate(bonCommande);
   },
+  paiementBonCommande: (paiementBonCommande) => {
+    const schema = Joi.object({
+      date: Joi.date().required(),
+      montant: Joi.number().required(),
+      bonCommandeId: Joi.objectId().required(),
+      modePaiement: Joi.string().required(),
+      numCheque: Joi.string().allow(""),
+      banque: Joi.string().allow(""),
+      commentaire: Joi.string().allow(""),
+      images: Joi.array(),
+    });
+    return schema.validate(paiementBonCommande);
+  },
   province: (province) => {
     const schema = Joi.object({
       nom: Joi.string().required(),
