@@ -28,11 +28,13 @@ const paiementsAccueil = require("../routes/paiementsAccueil");
 const bonCommandes = require("../routes/pharmacie/bonCommandes");
 const detailCouvertures = require("../routes/detailCouvertures");
 const paiementsPaginate = require("../routes/paiementsPaginate");
+const uniteMesures = require("../routes/pharmacie/uniteMesures");
 const specialiteMedecins = require("../routes/specialiteMedecins");
+const uniteReglementaires = require("../routes/pharmacie/uniteReglementaires");
 const categorieMedicaments = require("../routes/categorieMedicaments");
 const patientsListPaginate = require("../routes/patientsListPaginate");
-const paiementBonCommande = require("../routes/pharmacie/paiementBonCommande");
-
+const paiementBonCommandes = require("../routes/pharmacie/paiementBonCommandes");
+const receptionBonCommandes = require("../routes/pharmacie/receptionBonCommandes");
 const error = require("../middleware/error");
 const cors = require("cors");
 
@@ -66,12 +68,15 @@ module.exports = function (app) {
   app.use("/dentaldoc/couvertures", couvertures);
   app.use("/dentaldoc/natureactes", natureActes);
   app.use("/dentaldoc/boncommandes", bonCommandes);
+  app.use("/dentaldoc/unitemesures", uniteMesures);
   app.use("/dentaldoc/devispaginate", devisPaginate);
   app.use("/dentaldoc/actedentaires", acteDentaires);
   app.use("/dentaldoc/detailcouvertures", detailCouvertures);
   app.use("/dentaldoc/paiementspaginate", paiementsPaginate);
   app.use("/dentaldoc/specialitemedecins", specialiteMedecins);
-  app.use("/dentaldoc/paiementboncommande", paiementBonCommande);
+  app.use("/dentaldoc/unitereglementaires", uniteReglementaires);
+  app.use("/dentaldoc/paiementboncommande", paiementBonCommandes);
+  app.use("/dentaldoc/receptionboncommandes", receptionBonCommandes);
   app.use("/dentaldoc/categoriemedicaments", categorieMedicaments);
   app.use("/dentaldoc/patientslistpaginate", patientsListPaginate);
   app.use(error);

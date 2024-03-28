@@ -24,8 +24,8 @@ router.post("/", [auth, admin], async (req, res) => {
     nom,
     stockInitial,
     stockAlerte,
-    unite,
-    uniteReglementaire,
+    uniteMesureId,
+    uniteReglementairId,
     prixHT,
     tauxTVA,
     prixTTC,
@@ -39,13 +39,13 @@ router.post("/", [auth, admin], async (req, res) => {
   }
 
   const article = new Article({
-    lotId,
+    lotId: lotId ? lotId : undefined,
     code,
     nom,
     stockInitial,
     stockAlerte,
-    unite,
-    uniteReglementaire,
+    uniteMesureId: uniteMesureId ? uniteMesureId : undefined,
+    uniteReglementairId: uniteReglementairId ? uniteReglementairId : undefined,
     prixHT,
     tauxTVA,
     prixTTC,
@@ -65,8 +65,8 @@ router.put("/:id", [auth, admin], async (req, res) => {
     nom,
     stockInitial,
     stockAlerte,
-    unite,
-    uniteReglementaire,
+    uniteMesureId,
+    uniteReglementairId,
     prixHT,
     tauxTVA,
     prixTTC,
@@ -82,13 +82,15 @@ router.put("/:id", [auth, admin], async (req, res) => {
   const article = await Article.findByIdAndUpdate(
     req.params.id,
     {
-      lotId: lotId != "" ? lotId : undefined,
+      lotId: lotId ? lotId : undefined,
       code,
       nom,
       stockInitial,
       stockAlerte,
-      unite,
-      uniteReglementaire,
+      uniteMesureId: uniteMesureId ? uniteMesureId : undefined,
+      uniteReglementairId: uniteReglementairId
+        ? uniteReglementairId
+        : undefined,
       prixHT,
       tauxTVA,
       prixTTC,

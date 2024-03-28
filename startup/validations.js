@@ -73,8 +73,8 @@ module.exports = {
       nom: Joi.string().required(),
       stockInitial: Joi.number().allow(""),
       stockAlerte: Joi.number().allow(""),
-      unite: Joi.string().allow(""),
-      uniteReglementaire: Joi.string().allow(""),
+      uniteMesureId: Joi.objectId().allow(""),
+      uniteReglementaireId: Joi.objectId().allow(""),
       prixHT: Joi.number().allow(""),
       tauxTVA: Joi.number().allow(""),
       prixTTC: Joi.number().allow(""),
@@ -143,6 +143,21 @@ module.exports = {
     });
     return schema.validate(paiement);
   },
+  uniteMesure: (uniteMesure) => {
+    const schema = Joi.object({
+      nom: Joi.string().required(),
+      description: Joi.string().allow(""),
+    });
+    return schema.validate(uniteMesure);
+  },
+  uniteReglementaire: (uniteReglementaire) => {
+    const schema = Joi.object({
+      nom: Joi.string().required(),
+      description: Joi.string().allow(""),
+      normeApplicable: Joi.string().allow(""),
+    });
+    return schema.validate(uniteReglementaire);
+  },
   societe: (societe) => {
     const schema = Joi.object({
       nom: Joi.string().required(),
@@ -208,13 +223,24 @@ module.exports = {
       date: Joi.date().required(),
       montant: Joi.number().required(),
       bonCommandeId: Joi.objectId().required(),
-      modePaiement: Joi.string().required(),
+      modePaiement: Joi.string().allow(""),
       numCheque: Joi.string().allow(""),
       banque: Joi.string().allow(""),
       commentaire: Joi.string().allow(""),
       images: Joi.array(),
     });
     return schema.validate(paiementBonCommande);
+  },
+  receptionBonCommande: (receptionBonCommande) => {
+    const schema = Joi.object({
+      date: Joi.date().allow(""),
+      montant: Joi.number().allow(""),
+      bonCommandeId: Joi.objectId().required(),
+      articles: Joi.array(),
+      commentaire: Joi.string().allow(""),
+      images: Joi.array(),
+    });
+    return schema.validate(receptionBonCommande);
   },
   province: (province) => {
     const schema = Joi.object({

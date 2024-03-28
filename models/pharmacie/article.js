@@ -23,11 +23,13 @@ const articleSchema = new mongoose.Schema({
     type: Number,
   },
   // unite [g, ml, mg, cp, sup, amp, fl, sachet, tube, boite, seringue, pot, autre]
-  unite: {
-    type: String,
+  uniteMesureId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "UniteMesure",
   },
-  uniteReglementaire: {
-    type: String,
+  uniteReglementaireId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "UniteReglementaire",
   },
   prixHT: {
     type: Number,
