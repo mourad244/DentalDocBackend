@@ -16,6 +16,7 @@ router.get("/", async (req, res) => {
 
 router.post("/", [auth, admin], async (req, res) => {
   const { error } = validations.article(req.body);
+  console.log(error);
   if (error) return res.status(400).send(error.details[0].message);
 
   const {

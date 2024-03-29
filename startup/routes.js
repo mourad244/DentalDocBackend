@@ -33,6 +33,7 @@ const specialiteMedecins = require("../routes/specialiteMedecins");
 const uniteReglementaires = require("../routes/pharmacie/uniteReglementaires");
 const categorieMedicaments = require("../routes/categorieMedicaments");
 const patientsListPaginate = require("../routes/patientsListPaginate");
+const articlesListPaginate = require("../routes/pharmacie/articlesListPaginate");
 const paiementBonCommandes = require("../routes/pharmacie/paiementBonCommandes");
 const receptionBonCommandes = require("../routes/pharmacie/receptionBonCommandes");
 const error = require("../middleware/error");
@@ -76,8 +77,9 @@ module.exports = function (app) {
   app.use("/dentaldoc/specialitemedecins", specialiteMedecins);
   app.use("/dentaldoc/unitereglementaires", uniteReglementaires);
   app.use("/dentaldoc/paiementboncommande", paiementBonCommandes);
-  app.use("/dentaldoc/receptionboncommandes", receptionBonCommandes);
+  app.use("/dentaldoc/articleslistpaginate", articlesListPaginate);
   app.use("/dentaldoc/categoriemedicaments", categorieMedicaments);
   app.use("/dentaldoc/patientslistpaginate", patientsListPaginate);
+  app.use("/dentaldoc/receptionboncommandes", receptionBonCommandes);
   app.use(error);
 };
