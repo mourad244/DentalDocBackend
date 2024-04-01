@@ -1,9 +1,7 @@
 const express = require("express");
 
 const { Article } = require("../../models/pharmacie/article");
-const { Lot } = require("../../models/pharmacie/lot");
 const mongoose = require("mongoose");
-const ObjectId = new mongoose.Types.ObjectId();
 const auth = require("../../middleware/auth");
 const admin = require("../../middleware/admin");
 
