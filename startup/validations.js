@@ -77,6 +77,8 @@ module.exports = {
       uniteReglementaireId: Joi.objectId().allow(""),
       prixHT: Joi.number().allow(""),
       tauxTVA: Joi.number().allow(""),
+      images: Joi.array(),
+      imagesDeletedIndex: Joi.array(),
       prixTTC: Joi.number().allow(""),
       isExpiration: Joi.boolean().allow(""),
     });

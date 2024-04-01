@@ -43,6 +43,9 @@ const articleSchema = new mongoose.Schema({
   isExpiration: {
     type: Boolean,
   },
+  images: {
+    type: Array,
+  },
 });
 
 const Article = mongoose.model("Article", articleSchema);

@@ -6,22 +6,17 @@ const bonCommandeSchema = new mongoose.Schema({
     type: String,
     // required: true,
   },
-
-  //  date,
   date: {
     type: Date,
     // default: Date.now,
   },
-  //  objet,
   objet: {
     type: String,
   },
-  // titulaire,
   societeRetenuId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Societe",
   },
-  // montant,
   montantHT: {
     type: Number,
   },
