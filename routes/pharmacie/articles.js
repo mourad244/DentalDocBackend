@@ -2,7 +2,8 @@ const express = require("express");
 
 const { Article } = require("../../models/pharmacie/article");
 const { Lot } = require("../../models/pharmacie/lot");
-
+const mongoose = require("mongoose");
+const ObjectId = new mongoose.Types.ObjectId();
 const auth = require("../../middleware/auth");
 const admin = require("../../middleware/admin");
 
@@ -15,8 +16,44 @@ const compressImage = require("../../utils/compressImage");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const articles = await Article.find().populate("lotId").sort("code");
-  res.send(articles);
+  const page = parseInt(req.query.currentPage) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 15;
+  const sortColumn = req.query.sortColumn || "nom";
+  const order = req.query.order || "asc";
+  const searchQuery = req.query.searchQuery || "";
+  console.log(req.query);
+
+  const selectedLots = req.query.selectedLots;
+  const skipIndex = (page - 1) * pageSize;
+  let filter = {};
+  if (searchQuery) {
+    filter = {
+      $or: [
+        { code: { $regex: searchQuery, $options: "i" } },
+        { nom: { $regex: searchQuery, $options: "i" } },
+      ],
+    };
+  }
+  if (selectedLots !== undefined) {
+    if (selectedLots === "") return res.send({ data: [], totalCount: 0 });
+    const selectedLotsArray = selectedLots
+      .split(",")
+      .map((id) => new mongoose.Types.ObjectId(id.trim()));
+
+    filter.lotId = { $in: selectedLotsArray };
+  }
+  try {
+    const totalCount = await Article.countDocuments(filter);
+    const articles = await Article.find(filter)
+      // .populate("lotId")
+      .sort({ [sortColumn]: order === "asc" ? 1 : -1 })
+      .skip(skipIndex)
+      .limit(pageSize);
+    res.send({ data: articles, totalCount });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Error fetching articles data");
+  }
 });
 
 router.post("/", [auth, admin], async (req, res) => {

@@ -12,10 +12,8 @@ router.get("/", async (req, res) => {
   const selectedLots = req.query.selectedLots || [];
 
   const skipIndex = (page - 1) * pageSize;
-
   let filter = {};
-  if (searchQuery !== "") {
-    console.log("searchQueary", searchQuery);
+  if (searchQuery) {
     filter = {
       $or: [
         { code: { $regex: searchQuery, $options: "i" } },
@@ -29,14 +27,12 @@ router.get("/", async (req, res) => {
   //     lotId: { $in: selectedLots },
   //   };
   // }
-  console.log(filter);
   try {
     const totalCount = await Article.countDocuments(filter);
     const articles = await Article.find(filter)
       .sort({ [sortColumn]: order === "asc" ? 1 : -1 })
       .skip(skipIndex)
       .limit(pageSize);
-
     res.send({ data: articles, totalCount });
   } catch (error) {
     console.log(error);
