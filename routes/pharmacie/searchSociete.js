@@ -4,7 +4,7 @@ const { Societe } = require("../../models/pharmacie/societe");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const searchQuery = req.query.searchQuery;
+  const searchQuery = req.query.search;
 
   if (!searchQuery) {
     return res.status(400).send("Search string is required");

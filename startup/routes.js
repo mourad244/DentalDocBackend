@@ -73,7 +73,7 @@ module.exports = function (app) {
   app.use("/dentaldoc/unitemesures", uniteMesures);
   app.use("/dentaldoc/devispaginate", devisPaginate);
   app.use("/dentaldoc/actedentaires", acteDentaires);
-  app.use("/dentaldoc/searchsocietes", searchSociete);
+  app.use("/dentaldoc/searchsociete", searchSociete);
   app.use("/dentaldoc/detailcouvertures", detailCouvertures);
   app.use("/dentaldoc/paiementspaginate", paiementsPaginate);
   app.use("/dentaldoc/specialitemedecins", specialiteMedecins);
