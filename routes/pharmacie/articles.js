@@ -19,26 +19,30 @@ router.get("/", async (req, res) => {
   const sortColumn = req.query.sortColumn || "nom";
   const order = req.query.order || "asc";
   const searchQuery = req.query.searchQuery || "";
-  console.log(req.query);
 
   const selectedLots = req.query.selectedLots;
   const skipIndex = (page - 1) * pageSize;
-  let filter = {};
+  let filters = [];
   if (searchQuery) {
-    filter = {
+    filters.push({
       $or: [
         { code: { $regex: searchQuery, $options: "i" } },
         { nom: { $regex: searchQuery, $options: "i" } },
       ],
-    };
+    });
   }
-  if (selectedLots !== undefined) {
-    if (selectedLots === "") return res.send({ data: [], totalCount: 0 });
+  if (selectedLots !== undefined && selectedLots !== "") {
     const selectedLotsArray = selectedLots
       .split(",")
       .map((id) => new mongoose.Types.ObjectId(id.trim()));
 
-    filter.lotId = { $in: selectedLotsArray };
+    filters.push({ lotId: { $in: selectedLotsArray } });
+  }
+  let filter = {};
+  if (filters.length > 1) {
+    filter.$or = filters;
+  } else if (filters.length === 1) {
+    filter = filters[0];
   }
   try {
     const totalCount = await Article.countDocuments(filter);

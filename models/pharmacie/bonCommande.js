@@ -33,7 +33,7 @@ const bonCommandeSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Article",
       },
-      prixUnitaire: Number,
+      prixTTC: Number,
       quantiteTotal: Number,
       quantiteRestante: Number,
     },
