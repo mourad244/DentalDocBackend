@@ -142,9 +142,9 @@ router.put("/:id", [auth, admin], async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-  const bonCommande = await BonCommande.findById(req.params.id).populate(
-    "societeRetenuId"
-  );
+  const bonCommande = await BonCommande.findById(req.params.id)
+    .populate("societeRetenuId")
+    .populate("articles.articleId");
   if (!bonCommande)
     return res.status(404).send("le bonCommande avec cet id n'existe pas");
   res.send(bonCommande);

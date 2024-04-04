@@ -209,14 +209,15 @@ module.exports = {
       date: Joi.date().allow(""),
       objet: Joi.string().allow(""),
       societeRetenuId: Joi.objectId().allow(""),
-      montantHT: Joi.number().allow(""),
+      montantHT: Joi.number().allow("").allow(null),
       tva: Joi.number().allow(""),
-      montantTTC: Joi.number().allow(""),
+      montantTTC: Joi.number().allow("").allow(null),
       commentaire: Joi.string().allow(""),
       articles: Joi.array(),
       paiementIds: Joi.array(),
       isPayed: Joi.boolean().allow(""),
       images: Joi.array(),
+      imagesDeletedIndex: Joi.array(),
     });
     return schema.validate(bonCommande);
   },
