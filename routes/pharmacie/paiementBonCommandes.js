@@ -14,12 +14,49 @@ const deleteImages = require("../../middleware/deleteImages");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const paiementBonCommandes = await PaiementBonCommande.find()
-    .populate("bonCommandeId")
-    .sort("date");
-  res.send(paiementBonCommandes);
-});
+  const page = parseInt(req.query.currentPage) || 1;
+  const pageSize = parseInt(req.query.pageSize) || 15;
+  const sortColumn = req.query.sortColumn || "nom";
+  const order = req.query.order || "asc";
+  const time = req.query.time || "journee";
+  let date = req.query.date ? new Date(req.query.date) : new Date();
 
+  let start, end;
+  if (time === "journee") {
+    start = new Date(date.setHours(0, 0, 0, 0));
+    end = new Date(date.setHours(23, 59, 59, 999));
+  } else if (time === "mois") {
+    start = new Date(date.getFullYear(), date.getMonth(), 1);
+    end = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+  } else if (time === "annee") {
+    start = new Date(date.getFullYear(), 0, 1);
+    end = new Date(date.getFullYear(), 11, 31, 23, 59, 59, 999);
+  }
+  const query = {
+    date: {
+      $gte: start,
+      $lte: end,
+    },
+  };
+  const skipIndex = (page - 1) * pageSize;
+
+  try {
+    const totalCount = await PaiementBonCommande.countDocuments(query);
+    const paiementBonCommandes = await PaiementBonCommande.find(query)
+
+      .populate({
+        path: "bonCommandeId",
+      })
+
+      .sort({ [sortColumn]: order === "asc" ? 1 : -1 })
+      .skip(skipIndex)
+      .limit(pageSize);
+
+    res.send({ data: paiementBonCommandes, totalCount });
+  } catch (error) {
+    res.status(500).send("Error fetching paiements data");
+  }
+});
 router.post("/", [auth, admin], async (req, res) => {
   try {
     await uploadImages(req, res);
@@ -29,6 +66,7 @@ router.post("/", [auth, admin], async (req, res) => {
     });
   }
   const { error } = validations.paiementBonCommande(req.body);
+  console.log(error);
   if (error) {
     deleteImages(req.files);
     return res.status(400).send(error.details[0].message);

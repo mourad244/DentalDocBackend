@@ -68,7 +68,7 @@ module.exports = {
   },
   article: (article) => {
     const schema = Joi.object({
-      lotId: Joi.objectId().allow(""),
+      lotId: Joi.objectId().allow("").allow(null),
       code: Joi.string().required(),
       nom: Joi.string().required(),
       stockInitial: Joi.number().allow(""),
