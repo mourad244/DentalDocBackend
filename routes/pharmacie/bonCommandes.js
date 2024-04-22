@@ -62,7 +62,7 @@ router.post("/", [auth, admin], async (req, res) => {
       year: currentYear,
     });
   }
-  counter.lastNumOrdre++;
+  counter.lastNumOrdre += 1;
   const numOrdre = counter.lastNumOrdre;
 
   const bonCommande = new BonCommande({
@@ -77,7 +77,7 @@ router.post("/", [auth, admin], async (req, res) => {
     tva,
     images: newImages,
   });
-
+  await counter.save();
   await bonCommande.save();
   res.send(bonCommande);
 });

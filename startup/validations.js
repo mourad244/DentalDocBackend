@@ -207,6 +207,7 @@ module.exports = {
     const schema = Joi.object({
       numOrdre: Joi.string().allow(""),
       date: Joi.date().allow(""),
+      statut: Joi.string().allow(""),
       objet: Joi.string().allow(""),
       societeRetenuId: Joi.objectId().allow(""),
       montantHT: Joi.number().allow("").allow(null),
@@ -231,17 +232,20 @@ module.exports = {
       banque: Joi.string().allow(""),
       commentaire: Joi.string().allow(""),
       images: Joi.array(),
+      imagesDeletedIndex: Joi.array(),
     });
     return schema.validate(paiementBonCommande);
   },
   receptionBonCommande: (receptionBonCommande) => {
     const schema = Joi.object({
       date: Joi.date().allow(""),
-      montant: Joi.number().allow(""),
+      numOrdre: Joi.string().allow(""),
       bonCommandeId: Joi.objectId().required(),
       articles: Joi.array(),
       commentaire: Joi.string().allow(""),
+      isLast: Joi.boolean().allow(""),
       images: Joi.array(),
+      imagesDeletedIndex: Joi.array(),
     });
     return schema.validate(receptionBonCommande);
   },

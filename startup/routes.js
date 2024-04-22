@@ -85,6 +85,6 @@ module.exports = function (app) {
   app.use("/dentaldoc/categoriemedicaments", categorieMedicaments);
   app.use("/dentaldoc/patientslistpaginate", patientsListPaginate);
   app.use("/dentaldoc/boncommandeslistpaginate", bonCommandesListPaginate);
-  app.use("/dentaldoc/receptionboncommandes", receptionBonCommandes);
+  app.use("/dentaldoc/receptionbcs", receptionBonCommandes);
   app.use(error);
 };

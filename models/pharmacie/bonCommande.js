@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { ReceptionBonCommande } = require("./receptionBonCommande");
 
 const bonCommandeSchema = new mongoose.Schema({
   // N°,
@@ -65,6 +66,75 @@ const bonCommandeSchema = new mongoose.Schema({
     },
   ],
 });
+// create a function that i will call after updating reception bonCommande to update quantite restante in articles
+//  quantite restante is the difference between quantite total and the sum of all quantite in reception bonCommande stored in receptionIds
+bonCommandeSchema.methods.updateQuantiteRestante = async function () {
+  let articles = this.articles;
+  for (let i = 0; i < articles.length; i++) {
+    let article = articles[i];
+    let receptionIds = this.receptionIds;
+    let total = article.quantiteTotal;
+    let sum = 0;
+    for (let j = 0; j < receptionIds.length; j++) {
+      let receptionBonCommande = await ReceptionBonCommande.findById(
+        receptionIds[j]
+      );
+      let articleIndex = receptionBonCommande.articles.findIndex(
+        (a) => a.articleId.toString() === article.articleId.toString()
+      );
+      if (articleIndex !== -1) {
+        sum += receptionBonCommande.articles[articleIndex].quantite;
+      }
+    }
+    article.quantiteRestante = total - sum;
+  }
+  await this.save();
+};
+// ajouter une fonction qui définie le statut du bon de commande.
+// 1. chercher dans receptionIds si un paramètre boolean isLast qui determine si la reception de la bon de commande est terminé ou nn
+// 2. si isLast est true est sum quantite reçu = quantite total alors statut = Livré sinon Partiellement livré
+//3 . si isLast est false alors statut = En cours
+bonCommandeSchema.methods.updateStatut = async function () {
+  let receptionIds = this.receptionIds;
+  let articles = this.articles;
+  let sum = 0;
+  let total = 0;
+  let isLast = false;
+  for (let i = 0; i < articles.length; i++) {
+    total += articles[i].quantiteTotal;
+  }
+  for (let i = 0; i < receptionIds.length; i++) {
+    let receptionBonCommande = await ReceptionBonCommande.findById(
+      receptionIds[i]
+    );
+    if (receptionBonCommande.isLast) {
+      isLast = true;
+    }
+    for (let j = 0; j < articles.length; j++) {
+      let articleIndex = receptionBonCommande.articles.findIndex(
+        (a) => a.articleId.toString() === articles[j].articleId.toString()
+      );
+      if (articleIndex !== -1) {
+        sum += receptionBonCommande.articles[articleIndex].quantite;
+      }
+    }
+  }
+  if (isLast) {
+    if (sum === total) {
+      this.statut = "Livré";
+    } else {
+      this.statut = "Partiellement livré";
+    }
+  } else if (sum === 0) {
+    this.statut = "En attente";
+  } else if (sum >= total) {
+    this.statut = "Livré";
+  } else {
+    this.statut = "Partiellement en cours";
+  }
+  await this.save();
+};
+
 const BonCommande = mongoose.model("BonCommande", bonCommandeSchema);
 
 exports.bonCommandeSchema = bonCommandeSchema;

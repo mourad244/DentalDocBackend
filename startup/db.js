@@ -5,6 +5,6 @@ const config = require("config");
 
 module.exports = function () {
   mongoose
-    .connect(process.env.MONGODB_URI /* || config.get("db") */)
+    .connect(/* process.env.MONGODB_URI || */ config.get("db"))
     .then(() => logger.info("Connected to MongoDB..."));
 };

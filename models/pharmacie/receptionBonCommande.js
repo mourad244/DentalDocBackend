@@ -8,8 +8,8 @@ const receptionBonCommandeSchema = new mongoose.Schema({
   date: {
     type: Date,
   },
-  montant: {
-    type: Number,
+  numOrdre: {
+    type: String,
   },
   articles: [
     {
@@ -26,7 +26,11 @@ const receptionBonCommandeSchema = new mongoose.Schema({
   images: {
     type: Array,
   },
+  isLast: {
+    type: Boolean,
+  },
 });
+
 const ReceptionBonCommande = mongoose.model(
   "ReceptionBonCommande",
   receptionBonCommandeSchema

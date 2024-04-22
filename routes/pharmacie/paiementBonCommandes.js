@@ -160,7 +160,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.delete("/:id", [auth, admin], async (req, res) => {
-  const paiementBonCommande = await PaiementBonCommande.findByIdAndRemove(
+  const paiementBonCommande = await PaiementBonCommande.findOneAndDelete(
     req.params.id
   );
   if (!paiementBonCommande)
