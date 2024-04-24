@@ -10,17 +10,34 @@ const validations = require("../startup/validations");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const acteDentaires = await ActeDentaire.find()
-    .populate("natureId")
-    .sort("code");
-  res.send(acteDentaires);
+  const { currentPage, pageSize, sortColumn, order, searchQuery } = req.query;
+  if (currentPage && pageSize) {
+    const skipIndex = (currentPage - 1) * pageSize;
+    const filter = {};
+    if (searchQuery) {
+      filter.$or = [{ nom: { $regex: searchQuery, $options: "i" } }];
+    }
+    const totalCount = await ActeDentaire.countDocuments(filter);
+    const acteDentaires = await ActeDentaire.find(filter)
+      .populate("natureId")
+      .populate("articles.articleId")
+      .sort({ [sortColumn]: order === "asc" ? 1 : -1 })
+      .skip(skipIndex)
+      .limit(pageSize);
+    return res.send({ data: acteDentaires, totalCount });
+  } else {
+    const acteDentaires = await ActeDentaire.find()
+      .populate("natureId")
+      .sort("code");
+    return res.send(acteDentaires);
+  }
 });
 
 router.post("/", [auth, admin], async (req, res) => {
   const { error } = validations.acteDentaire(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const { nom, natureId, code, prix, duree, moments } = req.body;
+  const { nom, natureId, code, prix, duree, moments, articles } = req.body;
 
   // validation to delete if sure they are called just before
   if (natureId) {
@@ -35,6 +52,7 @@ router.post("/", [auth, admin], async (req, res) => {
     prix,
     duree,
     moments,
+    articles,
   });
   await acteDentaire.save();
   res.send(acteDentaire);
@@ -44,7 +62,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
   const { error } = validations.acteDentaire(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const { nom, natureId, code, prix, duree, moments } = req.body;
+  const { nom, natureId, code, prix, duree, moments, articles } = req.body;
   // validation to delete if sure they are called just before
   if (natureId && natureId != "") {
     const natureActe = await NatureActe.findById(natureId);
@@ -60,6 +78,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
       prix,
       duree,
       moments,
+      articles,
     },
     {
       new: true,

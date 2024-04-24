@@ -29,6 +29,15 @@ const acteDentaireSchema = new mongoose.Schema({
   moments: {
     type: [String],
   },
+  articles: [
+    {
+      articleId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Article",
+      },
+      quantite: Number,
+    },
+  ],
 });
 const ActeDentaire = mongoose.model("ActeDentaire", acteDentaireSchema);
 

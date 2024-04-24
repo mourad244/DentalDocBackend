@@ -18,6 +18,7 @@ const receptionBonCommandeSchema = new mongoose.Schema({
         ref: "Article",
       },
       quantite: Number,
+      datePeremption: Date,
     },
   ],
   commentaire: {

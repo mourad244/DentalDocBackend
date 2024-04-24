@@ -14,6 +14,7 @@ const compressImage = require("../../utils/compressImage");
 const uploadImages = require("../../middleware/uploadImages");
 const deleteImages = require("../../middleware/deleteImages");
 const { BonCommande } = require("../../models/pharmacie/bonCommande");
+const { Article } = require("../../models/pharmacie/article");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -91,6 +92,13 @@ router.post("/", [auth, admin], async (req, res) => {
   await receptionBonCommande.save();
   await bonCommande.updateQuantiteRestante();
   await bonCommande.updateStatut();
+  articles.forEach(async (article) => {
+    const articleToUpdate = await Article.findById(article.articleId);
+    articleToUpdate.receptionBCIds.push(receptionBonCommande._id);
+    await articleToUpdate.save();
+
+    await articleToUpdate.updateStockActuel();
+  });
   res.send(receptionBonCommande);
 });
 
@@ -148,6 +156,10 @@ router.put("/:id", [auth, admin], async (req, res) => {
   await bonCommande.updateQuantiteRestante();
   await bonCommande.updateStatut();
 
+  articles.forEach(async (article) => {
+    const articleToUpdate = await Article.findById(article.articleId);
+    await articleToUpdate.updateStockActuel();
+  });
   res.send(receptionBonCommande);
 });
 
@@ -187,6 +199,15 @@ router.delete("/:id", [auth, admin], async (req, res) => {
   await bonCommande.save();
   await bonCommande.updateQuantiteRestante();
   await bonCommande.updateStatut();
+  // delete receptionBonCommande from articles receptionBCIds
+  receptionBonCommande.articles.forEach(async (article) => {
+    const articleToUpdate = await Article.findById(article.articleId);
+    articleToUpdate.receptionBCIds = articleToUpdate.receptionBCIds.filter(
+      (id) => id.toString() !== req.params.id
+    );
+    await articleToUpdate.save();
+    await articleToUpdate.updateStockActuel();
+  });
 
   if (!receptionBonCommande)
     return res.status(404).send("ReceptionBonCommande not found");

@@ -14,14 +14,18 @@ const compressImage = require("../../utils/compressImage");
 const router = express.Router();
 
 router.get("/", async (req, res) => {
-  const page = parseInt(req.query.currentPage) || 1;
-  const pageSize = parseInt(req.query.pageSize) || 15;
+  const page = req.query.currentPage
+    ? parseInt(req.query.currentPage)
+    : undefined;
+  const pageSize = req.query.pageSize
+    ? parseInt(req.query.pageSize)
+    : undefined;
   const sortColumn = req.query.sortColumn || "nom";
   const order = req.query.order || "asc";
   const searchQuery = req.query.searchQuery || "";
-
   const selectedLots = req.query.selectedLots;
-  const skipIndex = (page - 1) * pageSize;
+  let skipIndex = undefined;
+  if (page && pageSize) skipIndex = (page - 1) * pageSize;
   let filters = [];
   if (searchQuery) {
     filters.push({
@@ -37,7 +41,10 @@ router.get("/", async (req, res) => {
       .map((id) => new mongoose.Types.ObjectId(id.trim()));
 
     filters.push({ lotId: { $in: selectedLotsArray } });
+  } else {
+    filters.push({ lotId: { $exists: false } });
   }
+
   let filter = {};
   if (filters.length > 1) {
     filter.$or = filters;
@@ -49,8 +56,8 @@ router.get("/", async (req, res) => {
     const articles = await Article.find(filter)
       // .populate("lotId")
       .sort({ [sortColumn]: order === "asc" ? 1 : -1 })
-      .skip(skipIndex)
-      .limit(pageSize);
+      .skip(skipIndex ? skipIndex : 0)
+      .limit(pageSize ? pageSize : 0);
     res.send({ data: articles, totalCount });
   } catch (error) {
     console.log(error);
@@ -67,7 +74,6 @@ router.post("/", [auth, admin], async (req, res) => {
     });
   }
   const { error } = validations.article(req.body);
-  console.log(error);
   if (error) {
     deleteImages(req.files);
     return res.status(400).send(error.details[0].message);
