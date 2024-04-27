@@ -39,6 +39,17 @@ const deviSchema = new mongoose.Schema({
       },
     },
   ],
+  articles: [
+    {
+      articleId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Article",
+      },
+      quantite: {
+        type: Number,
+      },
+    },
+  ],
 });
 const Devi = mongoose.model("Devi", deviSchema);
 

@@ -131,6 +131,7 @@ module.exports = {
       imagesDeletedIndex: Joi.array(),
       montant: Joi.number().allow("").allow(null),
       rdvIds: Joi.array(),
+      articles: Joi.array(),
       acteEffectues: Joi.array(),
     });
     return schema.validate(devi);

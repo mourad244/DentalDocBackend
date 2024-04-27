@@ -21,6 +21,11 @@ router.get("/", async (req, res) => {
     const acteDentaires = await ActeDentaire.find(filter)
       .populate("natureId")
       .populate("articles.articleId")
+      // populate uniteMesureId inside articleId inside articles
+      .populate({
+        path: "articles.articleId",
+        populate: { path: "uniteMesureId" },
+      })
       .sort({ [sortColumn]: order === "asc" ? 1 : -1 })
       .skip(skipIndex)
       .limit(pageSize);

@@ -7,7 +7,7 @@ const { Patient } = require("../models/patient");
 const { Medecin } = require("../models/medecin");
 const { CounterDevi } = require("../models/counterDevi");
 const { ActeDentaire } = require("../models/acteDentaire");
-
+const { Article } = require("../models/pharmacie/article");
 const auth = require("../middleware/auth");
 const admin = require("../middleware/admin");
 const validations = require("../startup/validations");
@@ -54,6 +54,7 @@ router.post("/", [auth, admin], async (req, res) => {
     montant,
     acteEffectues,
     rdvIds,
+    articles,
   } = req.body;
   const { image: images } = getPathData(req.files);
   if (images) compressImage(images);
@@ -117,12 +118,17 @@ router.post("/", [auth, admin], async (req, res) => {
   while (i < acteEffectues.length) {
     if (acteEffectues[i]) {
       const acteDentaire = await ActeDentaire.findById(acteEffectues[i].acteId);
+
       if (!acteDentaire) return res.status(400).send("acte Invalide.");
+      if (acteEffectues.length === 1) {
+        // add articles to acteDentaire
+        acteDentaire.articles = articles;
+      }
       // if prix of acteDentaire is null or undefined or 0 or "" then affect the price acteEffectues[i].prix to acteDentaire
       if (acteDentaire.prix === null || acteDentaire.prix === undefined) {
         acteDentaire.prix = acteEffectues[i].prix;
-        await acteDentaire.save();
       }
+      await acteDentaire.save();
       if (acteEffectues[i].dentIds && acteEffectues[i].dentIds.length !== 0)
         while (j < acteEffectues[i].dentIds.length) {
           const dent = await Dent.findById(acteEffectues[i].dentIds[j]);
@@ -132,14 +138,16 @@ router.post("/", [auth, admin], async (req, res) => {
     }
     i++;
   }
+
   const devi = new Devi({
-    numOrdre: numOrdre,
+    numOrdre,
     patientId: patient._id,
-    medecinId: medecinId,
-    dateDevi: dateDevi,
-    acteEffectues: acteEffectues,
-    montant: montant,
-    rdvIds: rdvIds,
+    medecinId,
+    dateDevi,
+    acteEffectues,
+    montant,
+    rdvIds,
+    articles,
     images: newImages,
   });
   patient.deviIds.push({
@@ -166,6 +174,12 @@ router.post("/", [auth, admin], async (req, res) => {
   await counter.save();
   await devi.save();
   await patient.save();
+  articles.forEach(async (article) => {
+    const articleToUpdate = await Article.findById(article.articleId);
+    articleToUpdate.deviIds.push(devi._id);
+    await articleToUpdate.save();
+    await articleToUpdate.updateStockActuel();
+  });
   res.send(devi);
 });
 
@@ -191,6 +205,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
     medecinId,
     dateDevi,
     montant,
+    articles,
     acteEffectues,
     imagesDeletedIndex,
   } = req.body;
@@ -220,11 +235,15 @@ router.put("/:id", [auth, admin], async (req, res) => {
     if (acteEffectues[i]) {
       const acteDentaire = await ActeDentaire.findById(acteEffectues[i].acteId);
       if (!acteDentaire) return res.status(400).send("acte Invalide.");
-
+      if (acteEffectues.length === 1) {
+        // add articles to acteDentaire
+        acteDentaire.articles = articles;
+      }
+      console.log("acticle", acteDentaire.articles);
       if (acteDentaire.prix === null || acteDentaire.prix === undefined) {
         acteDentaire.prix = acteEffectues[i].prix;
-        await acteDentaire.save();
       }
+      await acteDentaire.save();
       if (acteEffectues[i].dentIds && acteEffectues[i].dentIds.length != 0)
         while (j < acteEffectues[i].dentIds.length) {
           const dent = await Dent.findById(acteEffectues[i].dentIds[j]);
@@ -242,6 +261,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
     dateDevi,
     acteEffectues,
     montant,
+    articles,
     images: updatedImages,
   });
 
@@ -265,10 +285,13 @@ router.put("/:id", [auth, admin], async (req, res) => {
   updatedPatient.provinceId = newPatient.provinceId
     ? newPatient.provinceId
     : updatedPatient.provinceId;
-
   updatedPatient.calculateTotalDevis();
   updatedPatient.calculateBalance();
   await updatedPatient.save();
+  articles.forEach(async (article) => {
+    const articleToUpdate = await Article.findById(article.articleId);
+    await articleToUpdate.updateStockActuel();
+  });
   res.send(devi);
 });
 
@@ -279,6 +302,14 @@ router.get("/:id", async (req, res) => {
     })
     .populate({
       path: "patientId",
+    })
+    // populate articles
+    // populate lotId inside article Id
+    .populate({
+      path: "articles",
+      populate: {
+        path: "articleId",
+      },
     })
     .populate([
       {
@@ -328,6 +359,14 @@ router.delete("/:id", [auth, admin], async (req, res) => {
       }
     }
     await updatedPatient.save();
+    devi.articles.forEach(async (article) => {
+      const articleToUpdate = await Article.findById(article.articleId);
+      articleToUpdate.deviIds = articleToUpdate.deviIds.filter(
+        (id) => id.toString() !== devi._id.toString()
+      );
+      await articleToUpdate.save();
+      await articleToUpdate.updateStockActuel();
+    });
   } catch (error) {
     return res.status(500).send("An error occurred");
   }

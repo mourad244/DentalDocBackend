@@ -52,6 +52,12 @@ const articleSchema = new mongoose.Schema({
       ref: "ReceptionBonCommande",
     },
   ],
+  deviIds: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Devi",
+    },
+  ],
 });
 // add a methode to update stockActuel after calcualting the total quantity of all receptionBCs
 
@@ -59,12 +65,23 @@ articleSchema.methods.updateStockActuel = async function () {
   const receptionBCs = await this.model("ReceptionBonCommande").find({
     _id: { $in: this.receptionBCIds },
   });
+  const devis = await this.model("Devi").find({
+    _id: { $in: this.deviIds },
+  });
+
   let total = 0;
-  receptionBCs.forEach((receptionBC) => {
+  receptionBCs.forEach((receptionBC, index) => {
     const article = receptionBC.articles.find(
       (article) => article.articleId.toString() === this._id.toString()
     );
     total += article.quantite;
+  });
+  //  articles in devi consumed from stock
+  devis.forEach((devi) => {
+    const article = devi.articles.find(
+      (article) => article.articleId.toString() === this._id.toString()
+    );
+    total -= article.quantite;
   });
   this.stockActuel = total;
   await this.save();

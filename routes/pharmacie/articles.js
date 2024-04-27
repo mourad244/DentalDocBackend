@@ -41,9 +41,9 @@ router.get("/", async (req, res) => {
       .map((id) => new mongoose.Types.ObjectId(id.trim()));
 
     filters.push({ lotId: { $in: selectedLotsArray } });
-  } else {
+  } /*  else {
     filters.push({ lotId: { $exists: false } });
-  }
+  } */
 
   let filter = {};
   if (filters.length > 1) {
