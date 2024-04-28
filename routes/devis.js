@@ -239,7 +239,6 @@ router.put("/:id", [auth, admin], async (req, res) => {
         // add articles to acteDentaire
         acteDentaire.articles = articles;
       }
-      console.log("acticle", acteDentaire.articles);
       if (acteDentaire.prix === null || acteDentaire.prix === undefined) {
         acteDentaire.prix = acteEffectues[i].prix;
       }
