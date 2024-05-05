@@ -223,7 +223,29 @@ router.put("/:id", [auth, admin], async (req, res) => {
   await Article.findByIdAndUpdate(req.params.id, updatedArticleData);
   res.send(article);
 });
-
+router.get("/lowstock/count", async (req, res) => {
+  try {
+    const count = await Article.countDocuments({
+      $expr: { $lte: ["$stockActuel", "$stockAlerte"] },
+    });
+    res.json({ lowStockCount: count });
+  } catch (error) {
+    console.error("Error fetching low stock count:", error);
+    res.status(500).send("Error fetching low stock count");
+  }
+});
+router.get("/lowstock", async (req, res) => {
+  try {
+    const articles = await Article.find({
+      // Using $expr to compare fields within the same document
+      $expr: { $lte: ["$stockActuel", "$stockAlerte"] },
+    });
+    res.send(articles);
+  } catch (error) {
+    console.error("Error fetching low stock articles:", error);
+    res.status(500).send("Error fetching low stock articles");
+  }
+});
 router.get("/:id", async (req, res) => {
   const article = await Article.findById(req.params.id);
   if (!article)
@@ -237,5 +259,7 @@ router.delete("/:id", [auth, admin], async (req, res) => {
     return res.status(404).send("The article with the given ID was not found.");
   res.send(article);
 });
+
+// get the low stock articles
 
 module.exports = router;

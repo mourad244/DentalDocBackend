@@ -1,6 +1,6 @@
 const express = require("express");
-const { Rdv } = require("../models/rdv");
 
+const { Rdv } = require("../models/rdv");
 const { Patient } = require("../models/patient");
 
 const auth = require("../middleware/auth");
