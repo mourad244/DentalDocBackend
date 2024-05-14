@@ -4,5 +4,5 @@ logs/
 dist/
 *.log
 acteDentaireData.csv
-/images
+/images/*
 *bundle.js
