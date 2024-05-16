@@ -4,7 +4,14 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --mode production",
-    "start": "node dist/bundle.js"
+    "start": "node dist/bundle.js",
+    "test": "jest"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "**/__test__/**/*.js?(x)"
+    ]
   },
   "repository": {
     "type": "git",
