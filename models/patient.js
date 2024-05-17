@@ -129,6 +129,11 @@ const patientSchema = new mongoose.Schema({
     default: 0,
   },
 });
+// Add virtual property for full name
+patientSchema.virtual("fullName").get(function () {
+  return `${this.prenom} ${this.nom}`;
+});
+
 patientSchema.methods.calculateTotalDevis = function () {
   let total = 0;
   this.deviIds.forEach((devi) => {
@@ -148,6 +153,11 @@ patientSchema.methods.calculateTotalPaiements = function () {
 patientSchema.methods.calculateBalance = function () {
   this.balance = this.totalDevis - this.totalPaiements;
 };
+
+patientSchema.statics.findByProfession = function (profession) {
+  return this.find({ profession });
+};
+
 patientSchema.index({ nom: 1, prenom: 1, cin: 1 });
 
 const Patient = mongoose.model("Patient", patientSchema);

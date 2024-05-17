@@ -3,7 +3,7 @@ const { Patient } = require("../models/patient");
 
 const { Devi } = require("../models/devi");
 const { Medecin } = require("../models/medecin");
-
+const { Paiement } = require("../models/paiement");
 const { Couverture } = require("../models/couverture");
 const { Allergie } = require("../models/allergie");
 const { Pathologie } = require("../models/pathologie");

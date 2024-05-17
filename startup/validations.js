@@ -1,12 +1,12 @@
 const Joi = require("joi");
-
+const objectId = require("./joiObjectId");
 module.exports = {
   user: (userObj) => {
     const schema = Joi.object({
       nom: Joi.string().min(2).max(50),
       email: Joi.string().min(5).max(255).required().email(),
       password: Joi.string().min(5).max(255),
-      roleId: Joi.objectId(),
+      roleId: objectId(),
     });
     return schema.validate(userObj);
   },
@@ -39,7 +39,7 @@ module.exports = {
   acteDentaire: (acteDentaire) => {
     const schema = Joi.object({
       nom: Joi.string().required(),
-      natureId: Joi.objectId().allow(""),
+      natureId: objectId().allow(""),
       code: Joi.number().allow(""),
       prix: Joi.number().allow(""),
       duree: Joi.number().allow(""),
@@ -69,13 +69,13 @@ module.exports = {
   },
   article: (article) => {
     const schema = Joi.object({
-      lotId: Joi.objectId().allow("").allow(null),
+      lotId: objectId().allow("").allow(null),
       code: Joi.string().required(),
       nom: Joi.string().required(),
       stockInitial: Joi.number().allow(""),
       stockAlerte: Joi.number().allow(""),
-      uniteMesureId: Joi.objectId().allow(""),
-      uniteReglementaireId: Joi.objectId().allow(""),
+      uniteMesureId: objectId().allow(""),
+      uniteReglementaireId: objectId().allow(""),
       prixHT: Joi.number().allow(""),
       tauxTVA: Joi.number().allow(""),
       images: Joi.array(),
@@ -101,14 +101,14 @@ module.exports = {
       imagesDeletedIndex: Joi.array(),
       telephone: Joi.string().allow(""),
       ville: Joi.string().allow("").allow(null),
-      provinceId: Joi.objectId().allow("").allow(null),
-      regionId: Joi.objectId().allow("").allow(null),
+      provinceId: objectId().allow("").allow(null),
+      regionId: objectId().allow("").allow(null),
       prochainRdv: Joi.object(),
-      couvertureId: Joi.objectId().allow("").allow(null),
+      couvertureId: objectId().allow("").allow(null),
       medicamentIds: Joi.array(),
       pathologieIds: Joi.array(),
       allergieIds: Joi.array(),
-      detailCouvertureId: Joi.objectId().allow("").allow(null),
+      detailCouvertureId: objectId().allow("").allow(null),
       dateDerniereVisite: Joi.date().allow("").allow(null),
       deviIds: Joi.array(),
       paiementIds: Joi.array(),
@@ -122,10 +122,10 @@ module.exports = {
   },
   devi: (devi) => {
     const schema = Joi.object({
-      patientId: Joi.objectId().allow("").allow(null),
+      patientId: objectId().allow("").allow(null),
       newPatient: Joi.object(),
       numOrdre: Joi.number().allow(null).allow(""),
-      medecinId: Joi.objectId().required(),
+      medecinId: objectId().required(),
       dateDevi: Joi.date(),
       images: Joi.array(),
       imagesDeletedIndex: Joi.array(),
@@ -139,7 +139,7 @@ module.exports = {
   paiement: (paiement) => {
     const schema = Joi.object({
       numOrdre: Joi.number().allow(null).allow(""),
-      patientId: Joi.objectId().required(),
+      patientId: objectId().required(),
       mode: Joi.string().valid("Chèque", "Espèce"),
       numCheque: Joi.string().allow(""),
       date: Joi.date(),
@@ -187,7 +187,7 @@ module.exports = {
   },
   rdv: (rdv) => {
     const schema = Joi.object({
-      patientId: Joi.objectId().allow("").allow(null),
+      patientId: objectId().allow("").allow(null),
       newPatient: Joi.object(),
       datePrevu: Joi.date().required(),
       description: Joi.string().allow(""),
@@ -195,10 +195,10 @@ module.exports = {
       isAnnule: Joi.boolean().allow(null),
       isReporte: Joi.boolean().allow(null),
       dateNouveauRdv: Joi.date().allow(null).allow(""),
-      deviId: Joi.objectId().allow(null).allow(""),
-      natureId: Joi.objectId().allow(null).allow(""),
-      acteId: Joi.objectId().allow(null).allow(""),
-      lastRdvId: Joi.objectId().allow(null).allow(""),
+      deviId: objectId().allow(null).allow(""),
+      natureId: objectId().allow(null).allow(""),
+      acteId: objectId().allow(null).allow(""),
+      lastRdvId: objectId().allow(null).allow(""),
       heureDebut: Joi.object(),
       heureFin: Joi.object(),
       __v: Joi.number(),
@@ -211,7 +211,7 @@ module.exports = {
       date: Joi.date().allow(""),
       statut: Joi.string().allow(""),
       objet: Joi.string().allow(""),
-      societeRetenuId: Joi.objectId().allow(""),
+      societeRetenuId: objectId().allow(""),
       montantHT: Joi.number().allow("").allow(null),
       tva: Joi.number().allow(""),
       montantTTC: Joi.number().allow("").allow(null),
@@ -228,7 +228,7 @@ module.exports = {
     const schema = Joi.object({
       date: Joi.date().required(),
       montant: Joi.number().required(),
-      bonCommandeId: Joi.objectId().required(),
+      bonCommandeId: objectId().required(),
       modePaiement: Joi.string().allow(""),
       numCheque: Joi.string().allow(""),
       banque: Joi.string().allow(""),
@@ -242,7 +242,7 @@ module.exports = {
     const schema = Joi.object({
       date: Joi.date().allow(""),
       numOrdre: Joi.string().allow(""),
-      bonCommandeId: Joi.objectId().required(),
+      bonCommandeId: objectId().required(),
       articles: Joi.array(),
       commentaire: Joi.string().allow(""),
       isLast: Joi.boolean().allow(""),
@@ -255,7 +255,7 @@ module.exports = {
     const schema = Joi.object({
       nom: Joi.string().required(),
       code: Joi.string().allow("").allow(null),
-      regionId: Joi.objectId().allow("").allow(null),
+      regionId: objectId().allow("").allow(null),
     });
     return schema.validate(province);
   },
@@ -276,14 +276,14 @@ module.exports = {
   detailCouverture: (detailCouverture) => {
     const schema = Joi.object({
       nom: Joi.string().required(),
-      couvertureId: Joi.objectId().required(),
+      couvertureId: objectId().required(),
     });
     return schema.validate(detailCouverture);
   },
   medicament: (medicament) => {
     const schema = Joi.object({
       nom: Joi.string().required(),
-      categorieId: Joi.objectId().allow(""),
+      categorieId: objectId().allow(""),
       description: Joi.string().allow(""),
     });
     return schema.validate(medicament);

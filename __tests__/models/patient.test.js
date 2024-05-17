@@ -1,11 +1,8 @@
 const mongoose = require("mongoose");
-const { Patient } = require("../models/patient");
+const { Patient } = require("../../models/patient");
 
 beforeAll(async () => {
-  await mongoose.connect("mongodb://localhost:27017/testdb", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  await mongoose.connect("mongodb://localhost:27017/dentaldoc-test");
 });
 
 afterAll(async () => {
@@ -80,5 +77,35 @@ describe("Patient Model Test", () => {
     expect(patient.balance).toBe(300);
   });
 
-  // Add more tests as needed for other functionalities
+  describe("Patient Model Static Methods", () => {
+    it("should find patients by profession", async () => {
+      const patientsData = [
+        { nom: "Doe", prenom: "John", profession: "Engineer" },
+        { nom: "Smith", prenom: "Jane", profession: "Doctor" },
+        { nom: "Johnson", prenom: "Mike", profession: "Engineer" },
+      ];
+
+      await Patient.insertMany(patientsData);
+
+      const engineers = await Patient.findByProfession("Engineer");
+      expect(engineers.length).toBe(2);
+      expect(engineers[0].profession).toBe("Engineer");
+      expect(engineers[1].profession).toBe("Engineer");
+    });
+
+    // Add more tests for other static methods if any
+  });
+
+  describe("Patient Model Virtual Properties", () => {
+    it("should return full name as a virtual property", async () => {
+      const patient = new Patient({
+        nom: "Doe",
+        prenom: "John",
+      });
+      await patient.save();
+
+      const savedPatient = await Patient.findById(patient._id);
+      expect(savedPatient.fullName).toBe("John Doe");
+    });
+  });
 });
