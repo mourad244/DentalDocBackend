@@ -190,7 +190,6 @@ router.put("/:id", [auth, admin], async (req, res) => {
   } else {
     isMasculinBoolean = undefined;
   }
-  console.log("files", req);
   const { image: images } = getPathData(req.files);
   if (images) compressImage(images);
 
