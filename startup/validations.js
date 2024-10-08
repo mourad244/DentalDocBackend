@@ -3,8 +3,8 @@ const objectId = require("./joiObjectId");
 module.exports = {
   user: (userObj) => {
     const schema = Joi.object({
-      nom: Joi.string().min(2).max(50),
-      email: Joi.string().min(5).max(255).required().email(),
+      nom: Joi.string().min(2).max(50).required(),
+      email: Joi.string().min(5).max(255).email(),
       password: Joi.string().min(5).max(255),
       roleId: objectId(),
     });
