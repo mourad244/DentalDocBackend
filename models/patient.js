@@ -88,6 +88,24 @@ const patientSchema = new mongoose.Schema({
     type: String,
     maxlength: 50,
   },
+  telephones: [
+    {
+      type: String,
+      maxlength: 50,
+    },
+  ],
+  mutuelle: {
+    type: String,
+    maxlength: 255,
+  },
+  numMutuelle: {
+    type: String,
+    maxlength: 255,
+  },
+  observations: {
+    type: String,
+    maxlength: 255,
+  },
   ville: {
     type: String,
     maxlength: 255,
