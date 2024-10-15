@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
   const date = req.query.date;
   if (date) {
     // Assume a UTC+1 time zone for this example
-    const timeZoneOffsetInHours = 1;
+    const timeZoneOffsetInHours = 2;
     // If a date is provided, construct the start and end of the day in UTC
     const startOfDay = new Date(date);
     startOfDay.setUTCHours(-timeZoneOffsetInHours, 0, 0, 0); // Adjust for time zone offset
