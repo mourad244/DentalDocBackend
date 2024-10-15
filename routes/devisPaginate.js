@@ -15,7 +15,7 @@ router.get("/", async (req, res) => {
   let start, end;
 
   if (time === "journee") {
-    const timeZoneOffsetInHours = 1;
+    const timeZoneOffsetInHours = 2;
     start = new Date(date);
     start.setUTCHours(-timeZoneOffsetInHours, 0, 0, 0); // Adjust for time zone offset
     end = new Date(date);

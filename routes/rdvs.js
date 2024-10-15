@@ -31,7 +31,7 @@ router.get("/", async (req, res) => {
   const rdvs = await Rdv.find(query)
     .populate({
       path: "patientId",
-      select: "nom prenom telephone telephones",
+      select: "nom prenom telephone telephones isMasculin",
     })
     .populate({
       path: "deviId",
