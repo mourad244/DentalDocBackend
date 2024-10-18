@@ -98,10 +98,16 @@ router.post("/", [auth, admin], async (req, res) => {
   } else {
     isMasculinBoolean = undefined;
   }
-  const { image: images } = getPathData(req.files);
+  const { image: images, document: documents } = getPathData(req.files);
   if (images) compressImage(images);
   const newImages = images
     ? images.map((image) => image.destination + "/compressed/" + image.filename)
+    : [];
+
+  const newDocuments = documents
+    ? documents.map(
+        (document) => document.destination + "/" + document.filename
+      )
     : [];
   // validation to delete if sure they are called just before
   /*   if (couvertureId) {
@@ -154,6 +160,7 @@ router.post("/", [auth, admin], async (req, res) => {
     pathologieIds: pathologieIds ? pathologieIds : [],
     allergieIds: allergieIds ? allergieIds : [],
     images: newImages,
+    documents: newDocuments,
   });
   await patient.save();
   res.send(patient);
@@ -202,7 +209,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
   } else {
     isMasculinBoolean = undefined;
   }
-  const { image: images } = getPathData(req.files);
+  const { image: images, document: documents } = getPathData(req.files);
   if (images) compressImage(images);
 
   const patient = await Patient.findById(req.params.id);
@@ -214,6 +221,12 @@ router.put("/:id", [auth, admin], async (req, res) => {
     ? images.map((image) => image.destination + "/compressed/" + image.filename)
     : [];
 
+  const newDocuments = documents
+    ? documents.map(
+        (document) => document.destination + "/" + document.filename
+      )
+    : [];
+
   // Merge old and new images, excluding deleted ones
   const updatedImages =
     imagesDeletedIndex && imagesDeletedIndex.length !== 0
@@ -221,7 +234,8 @@ router.put("/:id", [auth, admin], async (req, res) => {
       : patient.images;
 
   updatedImages.push(...newImages);
-
+  const updatedDocuments =
+    newDocuments.length !== 0 ? newDocuments : patient.documents;
   // Update patient record
   const updatedPatientData = {
     cin: cin || "",
@@ -229,6 +243,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
     ville: ville || "",
     prenom: prenom || "",
     images: updatedImages,
+    documents: updatedDocuments,
     telephone: telephone || "",
     mutuelle: mutuelle || "",
     numMutuelle: numMutuelle || "",

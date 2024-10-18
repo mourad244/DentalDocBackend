@@ -89,6 +89,8 @@ router.post("/", [auth, admin], async (req, res) => {
       patient.provinceId = newPatient.provinceId
         ? newPatient.provinceId
         : undefined;
+      patient.mutuelle = newPatient.mutuelle;
+      patient.numMutuelle = newPatient.numMutuelle;
     } else {
       const { error } = validations.patient(newPatient);
       if (error) return res.status(400).send(error.details[0].message);
@@ -102,6 +104,8 @@ router.post("/", [auth, admin], async (req, res) => {
         provinceId: newPatient.provinceId
           ? newPatient.provinceId
           : patient.provinceId,
+        mutuelle: newPatient.mutuelle,
+        numMutuelle: newPatient.numMutuelle,
       });
     }
   }
@@ -284,6 +288,8 @@ router.put("/:id", [auth, admin], async (req, res) => {
   updatedPatient.provinceId = newPatient.provinceId
     ? newPatient.provinceId
     : updatedPatient.provinceId;
+  updatedPatient.mutuelle = newPatient.mutuelle;
+  updatedPatient.numMutuelle = newPatient.numMutuelle;
   updatedPatient.calculateTotalDevis();
   updatedPatient.calculateBalance();
   await updatedPatient.save();

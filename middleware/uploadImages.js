@@ -5,24 +5,45 @@ const maxsize = 2 * 1024 * 1024;
 
 var storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "images");
+    if (file.mimetype.includes("image")) {
+      cb(null, "images");
+    } else if (
+      file.mimetype.includes("pdf") ||
+      file.mimetype.includes("msword") ||
+      file.mimetype.includes("wordprocessingml")
+    ) {
+      cb(null, "documents");
+    }
   },
   filename: (req, file, cb) => {
-    cb(
-      null,
-      Date.now() +
-        "-" +
-        Math.round(Math.random() * 1e2) +
-        path.extname(file.originalname)
-    );
+    const extension = path.extname(file.originalname);
+    const originalName = path.basename(file.originalname, extension);
+    const timestamp = Date.now();
+
+    if (file.mimetype.includes("image")) {
+      // For images, use the existing logic
+      cb(null, `${timestamp}-${Math.round(Math.random() * 1e2)}${extension}`);
+    } else if (
+      file.mimetype.includes("pdf") ||
+      file.mimetype.includes("msword") ||
+      file.mimetype.includes("wordprocessingml")
+    ) {
+      // For documents, include the original name and timestamp
+      cb(null, `${originalName}-${timestamp}${extension}`);
+    }
   },
 });
 const fileFilter = (req, file, cb) => {
-  if (
-    file.mimetype == "image/jpeg" ||
-    file.mimetype == "image/png" ||
-    file.mimetype == "image/jpg"
-  ) {
+  const allowedMimeTypes = [
+    "image/jpeg",
+    "image/png",
+    "image/jpg",
+    "application/pdf",
+    "application/msword", // .doc
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
+  ];
+
+  if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
     cb(null, false);
@@ -34,13 +55,12 @@ const uploadImages = multer({
   limits: maxsize,
   fileFilter: fileFilter,
 });
-// .fields([
-//   { name: "image", maxCount: 4 },
-//   { name: "accessoire", maxCount: 4 },
-// ]);
-// .array("image" || "accessoire", 10);
 
 const uploadImagesMiddleware = util.promisify(
-  uploadImages.fields([{ name: "image" }])
+  uploadImages.fields([
+    { name: "image", maxCount: 10 },
+    { name: "document", maxCount: 10 },
+  ])
 );
+
 module.exports = uploadImagesMiddleware;

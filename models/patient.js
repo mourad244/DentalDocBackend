@@ -29,6 +29,9 @@ const patientSchema = new mongoose.Schema({
   images: {
     type: Array,
   },
+  documents: {
+    type: Array,
+  },
   couvertureId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Couverture",
