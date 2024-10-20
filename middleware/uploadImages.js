@@ -19,20 +19,26 @@ var storage = multer.diskStorage({
     const extension = path.extname(file.originalname);
     const originalName = path.basename(file.originalname, extension);
     const timestamp = Date.now();
+    let fileType = "";
 
-    if (file.mimetype.includes("image")) {
-      // For images, use the existing logic
-      cb(null, `${timestamp}-${Math.round(Math.random() * 1e2)}${extension}`);
+    if (file.mimetype.includes("pdf")) {
+      fileType = "pdf";
     } else if (
-      file.mimetype.includes("pdf") ||
       file.mimetype.includes("msword") ||
       file.mimetype.includes("wordprocessingml")
     ) {
-      // For documents, include the original name and timestamp
-      cb(null, `${originalName}-${timestamp}${extension}`);
+      fileType = "docx";
+    }
+
+    if (file.mimetype.includes("image")) {
+      cb(null, `${timestamp}-${Math.round(Math.random() * 1e2)}${extension}`);
+    } else {
+      // Append the file type (pdf or word) to the document file name
+      cb(null, `${originalName}-${fileType}-${timestamp}${extension}`);
     }
   },
 });
+
 const fileFilter = (req, file, cb) => {
   const allowedMimeTypes = [
     "image/jpeg",

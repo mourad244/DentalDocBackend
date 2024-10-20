@@ -6,6 +6,7 @@ require("dotenv").config();
 const app = express();
 
 app.use("/images", express.static("./images"));
+app.use("/documents", express.static("./documents"));
 require("./startup/routes")(app);
 require("./startup/db")();
 require("./startup/config")();

@@ -199,6 +199,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
     medicamentIds,
     pathologieIds,
     imagesDeletedIndex,
+    documentsDeletedIndex,
     detailCouvertureId,
   } = req.body;
   let isMasculinBoolean = undefined;
@@ -211,7 +212,6 @@ router.put("/:id", [auth, admin], async (req, res) => {
   }
   const { image: images, document: documents } = getPathData(req.files);
   if (images) compressImage(images);
-
   const patient = await Patient.findById(req.params.id);
 
   if (!patient) {
@@ -232,10 +232,22 @@ router.put("/:id", [auth, admin], async (req, res) => {
     imagesDeletedIndex && imagesDeletedIndex.length !== 0
       ? patient.images.filter((_, index) => !imagesDeletedIndex.includes(index))
       : patient.images;
-
+  // delete images
+  if (imagesDeletedIndex && imagesDeletedIndex.length !== 0)
+    deleteImages(imagesDeletedIndex.map((index) => patient.images[index]));
   updatedImages.push(...newImages);
   const updatedDocuments =
-    newDocuments.length !== 0 ? newDocuments : patient.documents;
+    documentsDeletedIndex && documentsDeletedIndex.length !== 0
+      ? patient.documents.filter(
+          (_, index) => !documentsDeletedIndex.includes(index)
+        )
+      : patient.documents;
+  updatedDocuments.push(...newDocuments);
+  // delete documents
+  if (documentsDeletedIndex && documentsDeletedIndex.length !== 0)
+    deleteImages(
+      documentsDeletedIndex.map((index) => patient.documents[index])
+    );
   // Update patient record
   const updatedPatientData = {
     cin: cin || "",
