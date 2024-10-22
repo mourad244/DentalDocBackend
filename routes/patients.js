@@ -147,6 +147,7 @@ router.post("/", [auth, admin], async (req, res) => {
     profession: profession ? profession : "",
     dateNaissance: dateNaissance ? dateNaissance : undefined,
     telephone: telephone ? telephone : "",
+    telephones: telephones ? telephones : [],
     ville: ville ? ville : "",
     telephones: telephones ? telephones : [],
     observations: observations ? observations : "",

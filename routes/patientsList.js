@@ -6,7 +6,7 @@ const router = express.Router();
 
 router.get("/", async (req, res) => {
   const patients = await Patient.find().select(
-    "dateNaissance isMasculin profession cin prochainRdv nom numOrdre prenom telephone regionId provinceId"
+    "dateNaissance isMasculin profession cin prochainRdv nom numOrdre prenom telephone telephones regionId provinceId"
   );
 
   res.send(patients);

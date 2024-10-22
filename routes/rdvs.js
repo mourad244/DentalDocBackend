@@ -73,6 +73,7 @@ router.post("/", [auth, admin], async (req, res) => {
       patient.prenom = newPatient.prenom;
       patient.isMasculin = newPatient.isMasculin;
       patient.telephone = newPatient.telephone;
+      patient.telephones = newPatient.telephones;
       patient.regionId = newPatient.regionId ? newPatient.regionId : undefined;
       patient.provinceId = newPatient.provinceId
         ? newPatient.provinceId
@@ -145,6 +146,7 @@ router.put("/:id", [auth, admin], async (req, res) => {
     patient.prenom = newPatient.prenom;
     patient.isMasculin = newPatient.isMasculin;
     patient.telephone = newPatient.telephone;
+    patient.telephones = newPatient.telephones;
     patient.regionId = newPatient.regionId ? newPatient.regionId : undefined;
     patient.provinceId = newPatient.provinceId
       ? newPatient.provinceId
@@ -207,7 +209,8 @@ router.put("/:id", [auth, admin], async (req, res) => {
 router.get("/:id", async (req, res) => {
   const rdv = await Rdv.findById(req.params.id).populate({
     path: "patientId",
-    select: "nom prenom telephone cin isMasculin regionId provinceId",
+    select:
+      "nom prenom telephone telephones cin isMasculin regionId provinceId",
   });
   if (!rdv) return res.status(404).send("le rdv avec cet id n'existe pas");
   res.send(rdv);

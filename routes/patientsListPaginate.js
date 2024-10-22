@@ -31,7 +31,7 @@ router.get("/", async (req, res) => {
       .skip(skipIndex)
       .limit(pageSize)
       .select(
-        "dateNaissance isMasculin profession cin prochainRdv nom numOrdre prenom telephone regionId provinceId"
+        "dateNaissance isMasculin profession cin prochainRdv nom numOrdre prenom telephone telephones regionId provinceId"
       );
     res.send({ data: patients, totalCount });
   } catch (error) {

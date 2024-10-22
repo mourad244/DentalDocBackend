@@ -85,6 +85,7 @@ router.post("/", [auth, admin], async (req, res) => {
       patient.prenom = newPatient.prenom;
       patient.isMasculin = newPatient.isMasculin;
       patient.telephone = newPatient.telephone;
+      patient.telephones = newPatient.telephones;
       patient.regionId = newPatient.regionId ? newPatient.regionId : undefined;
       patient.provinceId = newPatient.provinceId
         ? newPatient.provinceId
