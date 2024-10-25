@@ -9,6 +9,18 @@ const admin = require("../middleware/admin");
 const validations = require("../startup/validations");
 const router = express.Router();
 
+router.get("/patient/:id", async (req, res) => {
+  const rdvs = await Rdv.find({ patientId: req.params.id })
+    .populate({
+      // acteId
+      path: "acteId",
+      select: "nom",
+    })
+    .sort({
+      datePrevu: 1,
+    });
+  res.send(rdvs);
+});
 router.get("/", async (req, res) => {
   let query = {};
   const date = req.query.date;
