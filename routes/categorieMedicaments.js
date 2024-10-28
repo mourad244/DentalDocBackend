@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
   res.send(categorieMedicaments);
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   const { error } = validations.categorieMedicament(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const categorieMedicament = new CategorieMedicament({
@@ -21,7 +21,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(categorieMedicament);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   const { error } = validations.categorieMedicament(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -49,7 +49,7 @@ router.get("/:id", async (req, res) => {
   res.send(categorieMedicament);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const categorieMedicament = await CategorieMedicament.findOneAndDelete(
     req.params.id
   );

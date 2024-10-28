@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
   res.send(societes);
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   const { error } = validations.societe(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -59,7 +59,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(societe);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   const { error } = validations.societe(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const {
@@ -121,7 +121,7 @@ router.get("/:id", async (req, res) => {
   res.send(societe);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const societe = await Societe.findOneAndDelete({
     _id: req.params.id,
   });

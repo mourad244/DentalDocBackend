@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
   res.send(uniteReglementaires);
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   const { error } = validations.uniteReglementaire(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const uniteReglementaire = new UniteReglementaire({
@@ -25,7 +25,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(uniteReglementaire);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   const { error } = validations.uniteReglementaire(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -53,7 +53,7 @@ router.get("/:id", async (req, res) => {
   res.send(uniteReglementaire);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const uniteReglementaire = await UniteReglementaire.findOneAndDelete({
     _id: req.params.id,
   });

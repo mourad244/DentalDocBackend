@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
   res.send(allergies);
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   const { error } = validations.allergie(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const { nom } = req.body;
@@ -22,7 +22,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(allergie);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   const { error } = validations.allergie(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const { nom } = req.body;
@@ -47,7 +47,7 @@ router.get("/:id", async (req, res) => {
   res.send(allergie);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const allergie = await Allergie.findOneAndDelete({ _id: req.params.id });
   if (!allergie)
     return res.status(404).send("allergie avec cet id n'existe pas");

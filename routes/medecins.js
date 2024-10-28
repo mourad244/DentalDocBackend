@@ -13,7 +13,7 @@ router.get("/", async (req, res) => {
   res.send(medecins);
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   const { error } = validations.medecin(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -34,7 +34,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(medecin);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   const { error } = validations.medecin(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -69,7 +69,7 @@ router.get("/:id", async (req, res) => {
   res.send(medecin);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const medecin = await Medecin.findOneAndDelete({ _id: req.params.id });
   if (!medecin)
     return res.status(404).send("le medecin avec cet id n'existe pas");

@@ -18,6 +18,7 @@ const getPathData = require("../middleware/getPathData");
 const compressImage = require("../utils/compressImage");
 const uploadImages = require("../middleware/uploadImages");
 const deleteImages = require("../middleware/deleteImages");
+const ActivityLog = require("../models/activityLog");
 
 const router = express.Router();
 
@@ -55,7 +56,7 @@ router.get("/", async (req, res) => {
   res.send(patients);
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   try {
     await uploadImages(req, res);
   } catch (err) {
@@ -103,7 +104,7 @@ router.post("/", [auth, admin], async (req, res) => {
   const newImages = images
     ? images.map((image) => image.destination + "/compressed/" + image.filename)
     : [];
-
+  /*  */
   const newDocuments = documents
     ? documents.map(
         (document) => document.destination + "/" + document.filename
@@ -167,7 +168,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(patient);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth], async (req, res) => {
   try {
     await uploadImages(req, res);
   } catch (error) {
@@ -213,11 +214,12 @@ router.put("/:id", [auth, admin], async (req, res) => {
   }
   const { image: images, document: documents } = getPathData(req.files);
   if (images) compressImage(images);
-  const patient = await Patient.findById(req.params.id);
 
+  const patient = await Patient.findById(req.params.id);
   if (!patient) {
     return res.status(404).send("Patient not found");
   }
+
   const newImages = images
     ? images.map((image) => image.destination + "/compressed/" + image.filename)
     : [];
@@ -273,11 +275,33 @@ router.put("/:id", [auth, admin], async (req, res) => {
     dateNaissance: dateNaissance || undefined,
     detailCouvertureId: detailCouvertureId || undefined,
   };
-  await Patient.findByIdAndUpdate(req.params.id, updatedPatientData);
 
+  const diffrences = getDifferences(patient.toObject(), updatedPatientData);
+  await ActivityLog.create({
+    userId: req.user._id,
+    action: "update",
+    collectionName: "Patient",
+    documentId: patient._id,
+    details: diffrences,
+  });
+  await Patient.findByIdAndUpdate(req.params.id, updatedPatientData);
   res.send(patient);
 });
-
+function getDifferences(oldObj, newObj) {
+  const diffrences = {};
+  for (const key in oldObj) {
+    if (
+      JSON.stringify(oldObj[key]) !== JSON.stringify(newObj[key]) &&
+      key === "nom"
+    ) {
+      diffrences[key] = {
+        oldValue: oldObj[key],
+        newValue: newObj[key],
+      };
+    }
+  }
+  return diffrences;
+}
 router.get("/:id", async (req, res) => {
   const patient = await Patient.findById(req.params.id)
     .populate({
@@ -307,7 +331,7 @@ router.get("/:id", async (req, res) => {
   res.send(patient);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const patient = await Patient.findOneAndDelete({ _id: req.params.id });
   if (!patient)
     return res.status(404).send("le patient avec cet id n'existe pas");

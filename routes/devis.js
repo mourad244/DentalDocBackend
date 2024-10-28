@@ -32,7 +32,7 @@ router.get("/", async (req, res) => {
   res.send(devis);
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   try {
     await uploadImages(req, res);
   } catch (err) {
@@ -188,7 +188,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(devi);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   try {
     await uploadImages(req, res);
   } catch (error) {
@@ -338,7 +338,7 @@ router.get("/:id", async (req, res) => {
   res.send(devi);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const devi = await Devi.findOneAndDelete({ _id: req.params.id });
   if (!devi) return res.status(404).send("le devi avec cet id n'existe pas");
   if (devi.images) deleteImages(devi.images);

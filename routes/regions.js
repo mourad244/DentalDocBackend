@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
   res.send(regions);
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   const { error } = validations.region(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const { nom, code } = req.body;
@@ -23,7 +23,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(region);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   const { error } = validations.region(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const { nom, code } = req.body;
@@ -48,7 +48,7 @@ router.get("/:id", async (req, res) => {
   res.send(region);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const region = await Region.findOneAndDelete({ _id: req.params.id });
   if (!region) return res.status(404).send("l'region avec cet id n'existe pas");
   res.send(region);

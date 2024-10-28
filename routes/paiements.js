@@ -39,7 +39,7 @@ router.get("/", async (req, res) => {
   res.send(paiements);
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   const { error } = validations.paiement(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const { patientId, numCheque, mode, date, montant } = req.body;
@@ -80,7 +80,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(paiement);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   const { error } = validations.paiement(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -132,7 +132,7 @@ router.get("/:id", async (req, res) => {
   res.send(paiement);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const paiement = await Paiement.findOneAndDelete({ _id: req.params.id });
   if (!paiement)
     return res.status(404).send("le paiement avec cet id n'existe pas");

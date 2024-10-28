@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
   res.send(natureActes);
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   const { error } = validations.natureActe(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const natureActe = new NatureActe({
@@ -21,7 +21,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(natureActe);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   const { error } = validations.natureActe(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -45,7 +45,7 @@ router.get("/:id", async (req, res) => {
   res.send(natureActe);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const natureActe = await NatureActe.findOneAndDelete({ _id: req.params.id });
   if (!natureActe)
     return res.status(404).send("la nature de l'acte avec cet id n'existe pas");

@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
   res.send(pathologies);
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   const { error } = validations.pathologie(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const { nom } = req.body;
@@ -24,7 +24,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(pathologie);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   const { error } = validations.pathologie(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const { nom } = req.body;
@@ -53,7 +53,7 @@ router.get("/:id", async (req, res) => {
   res.send(pathologie);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const pathologie = await Pathologie.findOneAndDelete({ _id: req.params.id });
   if (!pathologie)
     return res.status(404).send("pathologie avec cet id n'existe pas");

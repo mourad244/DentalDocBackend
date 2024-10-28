@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
   res.send(roles);
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   const { error } = validations.role(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const role = new Role({
@@ -21,7 +21,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(role);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   const { error } = validations.role(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -43,7 +43,7 @@ router.get("/:id", async (req, res) => {
   res.send(role);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const role = await Role.findOneAndDelete({ _id: req.params.id });
   if (!role) return res.status(404).send("role avec cet id n'existe pas");
   res.send(role);

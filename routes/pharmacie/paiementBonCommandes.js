@@ -57,7 +57,7 @@ router.get("/", async (req, res) => {
     res.status(500).send("Error fetching paiements data");
   }
 });
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   try {
     await uploadImages(req, res);
   } catch (err) {
@@ -99,7 +99,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(paiementBonCommande);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   try {
     await uploadImages(req, res);
   } catch (err) {
@@ -159,7 +159,7 @@ router.get("/:id", async (req, res) => {
   res.send(paiementBonCommande);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const paiementBonCommande = await PaiementBonCommande.findOneAndDelete(
     req.params.id
   );

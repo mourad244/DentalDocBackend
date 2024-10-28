@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
   res.send(lots);
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   const { error } = validations.lot(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const lot = new Lot({
@@ -21,7 +21,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(lot);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   const { error } = validations.lot(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -43,7 +43,7 @@ router.get("/:id", async (req, res) => {
   res.send(lot);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const lot = await Lot.findOneAndDelete({ _id: req.params.id });
   if (!lot) return res.status(404).send("lot avec cet id n'existe pas");
   res.send(lot);

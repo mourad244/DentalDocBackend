@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
   res.send(uniteMesures);
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   const { error } = validations.uniteMesure(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const uniteMesure = new UniteMesure({
@@ -22,7 +22,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(uniteMesure);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   const { error } = validations.uniteMesure(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -46,7 +46,7 @@ router.get("/:id", async (req, res) => {
   res.send(uniteMesure);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const uniteMesure = await UniteMesure.findOneAndDelete({
     _id: req.params.id,
   });

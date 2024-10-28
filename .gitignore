@@ -6,4 +6,4 @@ dist/
 acteDentaireData.csv
 images/*
 *bundle.js
-docuements/*
+# documents/*

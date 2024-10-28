@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
   res.send(specialiteMedecins);
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   const { error } = validations.specialiteMedecin(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const specialiteMedecin = new SpecialiteMedecin({
@@ -21,7 +21,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(specialiteMedecin);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   const { error } = validations.specialiteMedecin(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -45,7 +45,7 @@ router.get("/:id", async (req, res) => {
   res.send(specialiteMedecin);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const specialiteMedecin = await SpecialiteMedecin.findOneAndDelete(
     req.params.id
   );

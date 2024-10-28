@@ -14,7 +14,7 @@ router.get("/", async (req, res) => {
   res.send(detailCouvertures);
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   const { error } = validations.detailCouverture(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const { nom, couvertureId } = req.body;
@@ -27,7 +27,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(detailCouverture);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   const { error } = validations.detailCouverture(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const { nom, couvertureId } = req.body;
@@ -52,7 +52,7 @@ router.get("/:id", async (req, res) => {
   res.send(detailCouverture);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const detailCouverture = await DetailCouverture.findOneAndDelete(
     req.params.id
   );

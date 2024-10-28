@@ -65,7 +65,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   try {
     await uploadImages(req, res);
   } catch (err) {
@@ -131,7 +131,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(article);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   try {
     await uploadImages(req, res);
   } catch (error) {
@@ -253,7 +253,7 @@ router.get("/:id", async (req, res) => {
   res.send(article);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const article = await Article.findOneAndDelete({ _id: req.params.id });
   if (!article)
     return res.status(404).send("The article with the given ID was not found.");

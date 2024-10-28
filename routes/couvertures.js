@@ -12,7 +12,7 @@ router.get("/", async (req, res) => {
   res.send(couvertures);
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   const { error } = validations.couverture(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const { nom, detailCouvertureIds } = req.body;
@@ -24,7 +24,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(couverture);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   const { error } = validations.couverture(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const { nom, detailCouvertureIds } = req.body;
@@ -49,7 +49,7 @@ router.get("/:id", async (req, res) => {
   res.send(couverture);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const couverture = await Couverture.findOneAndDelete({ _id: req.params.id });
   if (!couverture)
     return res.status(404).send("couverture avec cet id n'existe pas");

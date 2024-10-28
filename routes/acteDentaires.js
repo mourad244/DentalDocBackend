@@ -38,7 +38,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   const { error } = validations.acteDentaire(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -63,7 +63,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(acteDentaire);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   const { error } = validations.acteDentaire(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
@@ -102,7 +102,7 @@ router.get("/:id", async (req, res) => {
   res.send(acteDentaire);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const acteDentaire = await ActeDentaire.findOneAndDelete({
     _id: req.params.id,
   });

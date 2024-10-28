@@ -11,7 +11,7 @@ router.get("/", async (req, res) => {
   res.send(provinces);
 });
 
-router.post("/", [auth, admin], async (req, res) => {
+router.post("/", [auth /* admin */], async (req, res) => {
   const { error } = validations.province(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const { code, nom, regionId } = req.body;
@@ -24,7 +24,7 @@ router.post("/", [auth, admin], async (req, res) => {
   res.send(province);
 });
 
-router.put("/:id", [auth, admin], async (req, res) => {
+router.put("/:id", [auth /* admin */], async (req, res) => {
   const { error } = validations.province(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   const { code, nom, regionId } = req.body;
@@ -53,7 +53,7 @@ router.get("/:id", async (req, res) => {
   res.send(province);
 });
 
-router.delete("/:id", [auth, admin], async (req, res) => {
+router.delete("/:id", [auth /* admin */], async (req, res) => {
   const province = await Province.findOneAndDelete({ _id: req.params.id });
   if (!province)
     return res.status(404).send("la province avec cet id n'existe pas");
