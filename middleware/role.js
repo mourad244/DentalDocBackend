@@ -1,10 +1,9 @@
 const { User } = require("../models/user");
-const config = require("config");
-
+const requireAuth = process.env.REQUIRE_AUTH;
 module.exports = function (req, res, next) {
   // 401 Unauthorized
   // 403 Forbidden
-  if (!config.get("requiresAuth")) return next();
+  if (!requireAuth) return next();
 
   if (!canUpdate(req.user, /* req.params.id ||  */ req.params.userId)) {
     res.status(403);
