@@ -276,31 +276,36 @@ router.put("/:id", [auth], async (req, res) => {
     detailCouvertureId: detailCouvertureId || undefined,
   };
 
-  const diffrences = getDifferences(patient.toObject(), updatedPatientData);
-  await ActivityLog.create({
-    userId: req.user._id,
-    action: "update",
-    collectionName: "Patient",
-    documentId: patient._id,
-    details: diffrences,
-  });
+  const differences = getDifferences(patient.toObject(), updatedPatientData);
+  if (differences) {
+    await ActivityLog.create({
+      userId: req.user._id,
+      action: "update",
+      collectionName: "Patient",
+      documentId: patient._id,
+      details: differences,
+    });
+  }
   await Patient.findByIdAndUpdate(req.params.id, updatedPatientData);
   res.send(patient);
 });
 function getDifferences(oldObj, newObj) {
-  const diffrences = {};
+  const differences = {};
   for (const key in oldObj) {
     if (
-      JSON.stringify(oldObj[key]) !== JSON.stringify(newObj[key]) &&
-      key === "nom"
+      (JSON.stringify(oldObj[key]) !== JSON.stringify(newObj[key]) &&
+        key === "nom") ||
+      key === "prenom"
     ) {
-      diffrences[key] = {
+      differences[key] = {
         oldValue: oldObj[key],
         newValue: newObj[key],
       };
     }
   }
-  return diffrences;
+  // if differences is empty return null
+  if (Object.keys(differences).length === 0) return null;
+  return differences;
 }
 router.get("/:id", async (req, res) => {
   const patient = await Patient.findById(req.params.id)
@@ -333,6 +338,12 @@ router.get("/:id", async (req, res) => {
 
 router.delete("/:id", [auth /* admin */], async (req, res) => {
   const patient = await Patient.findOneAndDelete({ _id: req.params.id });
+  await ActivityLog.create({
+    userId: req.user._id,
+    action: "delete",
+    collectionName: "Patient",
+    documentId: patient._id,
+  });
   if (!patient)
     return res.status(404).send("le patient avec cet id n'existe pas");
   if (patient.images) deleteImages(patient.images);
