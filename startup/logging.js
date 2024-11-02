@@ -31,7 +31,7 @@ const logger = createLogger({
   ],
   handleExceptions: true,
 });
-
+//
 // Log to database
 // logger.add(
 //   new transports.MongoDB({
@@ -52,8 +52,9 @@ if (
 ) {
   const consoleFormat = format.printf(function (info) {
     // console.log(info);
-    return `${info.timestamp
-      } - ${info.level}: ${JSON.stringify(info.message, null, 4)}`;
+    return `${
+      info.timestamp
+    } - ${info.level}: ${JSON.stringify(info.message, null, 4)}`;
   });
 
   logger.add(
