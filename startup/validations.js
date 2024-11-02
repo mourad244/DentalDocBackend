@@ -45,6 +45,7 @@ module.exports = {
       duree: Joi.number().allow(""),
       moments: Joi.array(),
       articles: Joi.array(),
+      __v: Joi.number().allow(""),
     });
     return schema.validate(acteDentaire);
   },
