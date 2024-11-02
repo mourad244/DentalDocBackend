@@ -99,6 +99,7 @@ module.exports = {
       profession: Joi.string().allow(""),
       dateNaissance: Joi.date().allow("").allow(null),
       images: Joi.array(),
+      age: Joi.number().allow("").allow(null),
       documents: Joi.array(),
       imagesDeletedIndex: Joi.array(),
       documentsDeletedIndex: Joi.array(),
