@@ -42,7 +42,8 @@ router.post("/", [auth /* admin */], async (req, res) => {
   const { error } = validations.acteDentaire(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const { nom, natureId, code, prix, duree, moments, articles } = req.body;
+  const { nom, abreviation, natureId, code, prix, duree, moments, articles } =
+    req.body;
 
   // validation to delete if sure they are called just before
   if (natureId) {
@@ -52,6 +53,7 @@ router.post("/", [auth /* admin */], async (req, res) => {
 
   const acteDentaire = new ActeDentaire({
     nom,
+    abreviation,
     natureId,
     code,
     prix,
@@ -67,7 +69,8 @@ router.put("/:id", [auth /* admin */], async (req, res) => {
   const { error } = validations.acteDentaire(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
-  const { nom, natureId, code, prix, duree, moments, articles } = req.body;
+  const { nom, abreviation, natureId, code, prix, duree, moments, articles } =
+    req.body;
   // validation to delete if sure they are called just before
   if (natureId && natureId != "") {
     const natureActe = await NatureActe.findById(natureId);
@@ -78,6 +81,7 @@ router.put("/:id", [auth /* admin */], async (req, res) => {
     req.params.id,
     {
       nom,
+      abreviation,
       natureId: natureId != "" ? natureId : undefined,
       code,
       prix,

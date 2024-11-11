@@ -14,7 +14,7 @@ router.get("/patient/:id", async (req, res) => {
     .populate({
       // acteId
       path: "acteId",
-      select: "nom",
+      select: "nom abreviation",
     })
     .sort({
       datePrevu: 1,
@@ -51,7 +51,7 @@ router.get("/", async (req, res) => {
     })
     .populate({
       path: "acteId",
-      select: "nom",
+      select: "nom abreviation",
     })
     .sort("datePrevu");
   res.send(rdvs);

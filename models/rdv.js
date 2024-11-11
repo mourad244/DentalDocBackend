@@ -15,7 +15,6 @@ const rdvSchema = new mongoose.Schema({
   },
   isHonnore: {
     type: Boolean,
-    default: false,
   },
   isAnnule: {
     type: Boolean,

@@ -39,6 +39,7 @@ module.exports = {
   acteDentaire: (acteDentaire) => {
     const schema = Joi.object({
       nom: Joi.string().required(),
+      abreviation: Joi.string().allow(""),
       natureId: objectId().allow(""),
       code: Joi.number().allow(""),
       prix: Joi.number().allow(""),

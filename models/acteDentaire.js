@@ -5,6 +5,11 @@ const acteDentaireSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  // donne moi une variable qui signifie un terme plus réduit de nom
+  abreviation: {
+    type: String,
+    required: true,
+  },
   natureId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "NatureActe",
