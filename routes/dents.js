@@ -17,6 +17,7 @@ router.post("/", [auth /* admin */], async (req, res) => {
   const dent = new Dent({
     numeroFDI: req.body.numeroFDI,
     description: req.body.description,
+    code: req.body.code,
   });
   await dent.save();
   res.send(dent);
@@ -28,7 +29,11 @@ router.put("/:id", [auth /* admin */], async (req, res) => {
 
   const dent = await Dent.findByIdAndUpdate(
     req.params.id,
-    { numeroFDI: req.body.numeroFDI, description: req.body.description },
+    {
+      numeroFDI: req.body.numeroFDI,
+      description: req.body.description,
+      code: req.body.code,
+    },
     {
       new: true,
     }

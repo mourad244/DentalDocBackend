@@ -71,9 +71,17 @@ router.post("/", [auth /* admin */], async (req, res) => {
   }
 
   const {
+    isPatientAssure,
+    nomAssure,
+    prenomAssure,
+    numAffiliationAssure,
+    numImmatriculationAssure,
+    numCINAssure,
+    addresseAssure,
+    isConjoint,
     cin,
     nom,
-    ville,
+    adresse,
     prenom,
     regionId,
     telephone,
@@ -140,7 +148,19 @@ router.post("/", [auth /* admin */], async (req, res) => {
       if (!allergie) return res.status(400).send("Allergie invalide");
     });
   } */
+  console.log("isConjoint", isConjxoint);
   const patient = new Patient({
+    isPatientAssure: isPatientAssure,
+    nomAssure: nomAssure ? nomAssure : "",
+    prenomAssure: prenomAssure ? prenomAssure : "",
+    numAffiliationAssure: numAffiliationAssure ? numAffiliationAssure : "",
+    numImmatriculationAssure: numImmatriculationAssure
+      ? numImmatriculationAssure
+      : "",
+    addresseAssure: addresseAssure ? addresseAssure : "",
+    numCINAssure: numCINAssure ? numCINAssure : "",
+    isConjoint:
+      isConjoint === true || isConjoint === false ? isConjoint : undefined,
     cin: cin ? cin : "",
     nom: nom ? nom : "",
     prenom: prenom ? prenom : "",
@@ -149,7 +169,7 @@ router.post("/", [auth /* admin */], async (req, res) => {
     dateNaissance: dateNaissance ? dateNaissance : undefined,
     telephone: telephone ? telephone : "",
     telephones: telephones ? telephones : [],
-    ville: ville ? ville : "",
+    adresse: adresse ? adresse : "",
     telephones: telephones ? telephones : [],
     observations: observations ? observations : "",
     mutuelle: mutuelle ? mutuelle : "",
@@ -182,9 +202,17 @@ router.put("/:id", [auth], async (req, res) => {
     return res.status(400).send(error.details[0].message);
   }
   const {
+    isPatientAssure,
+    nomAssure,
+    prenomAssure,
+    numAffiliationAssure,
+    numImmatriculationAssure,
+    numCINAssure,
+    adresseAssure,
+    isConjoint,
     cin,
     nom,
-    ville,
+    adresse,
     prenom,
     regionId,
     telephone,
@@ -253,9 +281,17 @@ router.put("/:id", [auth], async (req, res) => {
     );
   // Update patient record
   const updatedPatientData = {
+    isPatientAssure: isPatientAssure,
+    nomAssure: nomAssure || "",
+    prenomAssure: prenomAssure || "",
+    numAffiliationAssure: numAffiliationAssure || "",
+    numImmatriculationAssure: numImmatriculationAssure || "",
+    numCINAssure: numCINAssure || "",
+    adresseAssure: adresseAssure || "",
+    isConjoint: isConjoint,
     cin: cin || "",
     nom: nom || "",
-    ville: ville || "",
+    adresse: adresse || "",
     prenom: prenom || "",
     images: updatedImages,
     documents: updatedDocuments,

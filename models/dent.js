@@ -8,6 +8,9 @@ const dentSchema = new mongoose.Schema({
   description: {
     type: String,
   },
+  code: {
+    type: String,
+  },
 });
 const Dent = mongoose.model("Dent", dentSchema);
 

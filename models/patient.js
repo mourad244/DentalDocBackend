@@ -1,6 +1,38 @@
 const mongoose = require("mongoose");
 
 const patientSchema = new mongoose.Schema({
+  isPatientAssure: {
+    type: Boolean,
+    default: true,
+  },
+  nomAssure: {
+    type: String,
+    maxlength: 50,
+  },
+  prenomAssure: {
+    type: String,
+    maxlength: 50,
+  },
+  numAffiliationAssure: {
+    type: String,
+    maxlength: 50,
+  },
+  numImmatriculationAssure: {
+    type: String,
+    maxlength: 50,
+  },
+  numCINAssure: {
+    type: String,
+    maxlength: 50,
+  },
+  adresseAssure: {
+    type: String,
+    maxlength: 255,
+  },
+  isConjoint: {
+    type: Boolean,
+    default: false,
+  },
   dateRecu: {
     type: String,
   },
@@ -109,7 +141,7 @@ const patientSchema = new mongoose.Schema({
     type: String,
     maxlength: 255,
   },
-  ville: {
+  adresse: {
     type: String,
     maxlength: 255,
   },

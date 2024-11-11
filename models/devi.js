@@ -37,6 +37,7 @@ const deviSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
       },
+      // est ce qu'on a déja rempli l'acte dans la mutuelle
     },
   ],
   articles: [
@@ -50,6 +51,27 @@ const deviSchema = new mongoose.Schema({
       },
     },
   ],
+  isCoveredMutuelle: {
+    type: Boolean,
+    default: false,
+  },
+  mutuelle: {
+    signatureDate: {
+      type: Date,
+    },
+    signatureLieu: {
+      type: String,
+    },
+    numBordereau: {
+      type: String,
+    },
+    numDossier: {
+      type: String,
+    },
+    nombrePieces: {
+      type: Number,
+    },
+  },
 });
 const Devi = mongoose.model("Devi", deviSchema);
 

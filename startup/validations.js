@@ -53,6 +53,7 @@ module.exports = {
     const schema = Joi.object({
       numeroFDI: Joi.string().required(),
       description: Joi.string().allow(""),
+      code: Joi.string().allow("").allow(null),
     });
     return schema.validate(dent);
   },
@@ -88,6 +89,14 @@ module.exports = {
   },
   patient: (patient) => {
     const schema = Joi.object({
+      isPatientAssure: Joi.boolean().allow("").allow(null),
+      nomAssure: Joi.string().allow(""),
+      prenomAssure: Joi.string().allow(""),
+      numAffiliationAssure: Joi.string().allow(""),
+      numImmatriculationAssure: Joi.string().allow(""),
+      numCINAssure: Joi.string().allow(""),
+      adresseAssure: Joi.string().allow(""),
+      isConjoint: Joi.boolean().allow("").allow(null),
       nom: Joi.string().required(),
       prenom: Joi.string().required(),
       cin: Joi.string().allow("").allow(null),
@@ -108,7 +117,7 @@ module.exports = {
       observations: Joi.string().allow(""),
       telephones: Joi.array(),
       numMutuelle: Joi.string().allow(""),
-      ville: Joi.string().allow("").allow(null),
+      adresse: Joi.string().allow("").allow(null),
       provinceId: objectId().allow("").allow(null),
       regionId: objectId().allow("").allow(null),
       prochainRdv: Joi.object(),

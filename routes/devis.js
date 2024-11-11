@@ -301,6 +301,15 @@ router.put("/:id", [auth /* admin */], async (req, res) => {
   res.send(devi);
 });
 
+router.put("/mutuelle/:id", [auth /* admin */], async (req, res) => {
+  const { isCoveredMutuelle, mutuelle } = req.body;
+  const devi = await Devi.findById(req.params.id);
+  if (!devi) return res.status(400).send("Devi Invalide.");
+  devi.isCoveredMutuelle = isCoveredMutuelle;
+  devi.mutuelle = mutuelle;
+  await devi.save();
+  res.send(devi);
+});
 router.get("/:id", async (req, res) => {
   const devi = await Devi.findById(req.params.id)
     .populate({
