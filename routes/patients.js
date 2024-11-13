@@ -148,9 +148,12 @@ router.post("/", [auth /* admin */], async (req, res) => {
       if (!allergie) return res.status(400).send("Allergie invalide");
     });
   } */
-  console.log("isConjoint", isConjxoint);
+  console.log("isPatientAssure", isPatientAssure);
   const patient = new Patient({
-    isPatientAssure: isPatientAssure,
+    isPatientAssure:
+      isPatientAssure === true || isPatientAssure === false
+        ? isPatientAssure
+        : undefined,
     nomAssure: nomAssure ? nomAssure : "",
     prenomAssure: prenomAssure ? prenomAssure : "",
     numAffiliationAssure: numAffiliationAssure ? numAffiliationAssure : "",
@@ -281,7 +284,10 @@ router.put("/:id", [auth], async (req, res) => {
     );
   // Update patient record
   const updatedPatientData = {
-    isPatientAssure: isPatientAssure,
+    isPatientAssure:
+      isPatientAssure === true || isPatientAssure === false
+        ? isPatientAssure
+        : undefined,
     nomAssure: nomAssure || "",
     prenomAssure: prenomAssure || "",
     numAffiliationAssure: numAffiliationAssure || "",
